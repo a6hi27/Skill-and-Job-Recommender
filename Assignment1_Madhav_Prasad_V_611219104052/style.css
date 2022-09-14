@@ -100,7 +100,21 @@ a {
 	display: block;
 	margin-bottom: -0.8rem;
 }
-
+.downloadBtn {
+	color: var(--primary-color) ;
+	background-color: #070707;
+	font-size: 1.6rem;
+	margin-top: 1rem;
+}
+.hireBtn {
+	color: var(--primary-color) ;
+	background-color: #070707;
+	font-size: 1.6rem;
+	margin-top: 1rem;
+	border: none;
+	outline: none;
+	border-color: #070707;
+}
 
 /* Expertise */
 .skills_list {
