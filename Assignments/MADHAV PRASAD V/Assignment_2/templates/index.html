@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <title>Forzo Shopping</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap">
+</head>
+<style>
+  * {
+    font-family: 'Cascadia Code', serif;
+  }
+
+  body {
+    background-image:
+      linear-gradient(rgba(255, 0, 200, 0.884), #59e6ff);
+    overflow: hidden;
+    max-width: 100%;
+  }
+
+  .boxed {
+    border-radius: 0 12px 12px 0;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    border-radius: 10px;
+    width: 700px;
+    height: 500px;
+    margin: 95px auto;
+    border-radius: 25px;
+  }
+
+  .logo {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 50%;
+  }
+
+  .logo img{
+    margin-top: 17px;
+  }
+
+  .home {
+    color: yellow;
+    text-align: center;
+    text-decoration: underline;
+    font-size: 30px;
+    width: 100%;
+    margin: 1% auto;
+  }
+
+  .text {
+    color:white;
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+    font-style: italic;
+    margin: 3% 10% 0% 10%;
+    width: 80%;
+  }
+
+</style>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light">
+      <a class="navbar-brand text-light" href="#">Forzo</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link text-light" href="aboutus">About <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="signin">Signin</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="signup">Signup</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="boxed">
+    <div class="logo"><img src="static/logo.png" alt="logo" height="200"></div>
+    <div class="home">
+      <p>Forzo</p>
+    </div>
+    <div class="text">
+      <p>This is the home page of Forzo! Fashion is a form of self-expression and autonomy at a particular period and place and in a specific context, of clothing, footwear, lifestyle, accessories, makeup, hairstyle, and body posture.
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>
