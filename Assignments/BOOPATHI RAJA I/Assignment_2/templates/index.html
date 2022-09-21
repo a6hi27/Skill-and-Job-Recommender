@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <title>Super Foods</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap">
+</head>
+<style>
+  * {
+    font-family: 'Playfair Display', serif;
+  }
+
+  body {
+    background-color: #1fc8db;
+    background-image: linear-gradient(150deg, #EADEDB 0%, #BC70A4 50%, #BFD641 75%);
+  }
+
+  .boxed {
+    background-color:rgb(0, 0, 0,0.2);
+    width: 700px;
+    height: 500px;
+    margin: 100px auto;
+    border-radius: 25px;
+  }
+
+  .logo {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 50%;
+  }
+
+  .logo img{
+    margin-top: 17px;
+  }
+
+  .home {
+    color: orange;
+    text-align: center;
+    text-decoration: underline;
+    font-size: 30px;
+    width: 100%;
+  }
+
+  .text {
+    color: aliceblue;
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+    font-style: italic;
+    margin: 3% 10% 0% 10%;
+    width: 80%;
+  }
+</style>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand text-light" href="#">Super Foods</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link text-light" href="aboutus">About <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="signin">Signin</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="signup">Signup</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="boxed">
+    <div class="logo"><img src="static/logo.png" alt="logo" height="200"></div>
+    <div class="home">
+      <p>Super Foods</p>
+    </div>
+    <div class="text">
+      <p>This is the home page of Super Foods! A food is something that provides nutrients. is a company that produces healthy food products. They offer a variety of items such as snacks, meals, and drinks. Their products are all natural and free from preservatives.
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>
