@@ -1,12 +1,14 @@
 <head>
+    <title>Signup</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='signup.css')}}">
 </head>
 
 <body>
+    <script src="../static/validation.js"></script>
     <div class="signup-form">
-        <form action="/examples/actions/confirmation.php" method="post">
+        <form action="/adduser" onsubmit="return valid()" method="post">
             <h2>Register</h2>
             <p class="hint-text">Create your account. It's free and only takes a minute.</p>
             <div class="form-group">
@@ -21,10 +23,10 @@
                 <input type="email" class="form-control" name="email" placeholder="Email" required="required">
             </div>
             <div class="form-group">
-                <input type="password" class="form-control" name="password" placeholder="Password" required="required">
+                <input type="password" class="form-control" name="password" id="password" placeholder="Password" required="required">
             </div>
             <div class="form-group">
-                <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password"
+                <input type="password" class="form-control" id='cpassword' name="confirm_password" placeholder="Confirm Password"
                     required="required">
             </div>
             <div class="form-group">
@@ -32,7 +34,10 @@
                         href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a></label>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-success btn-lg btn-block">Register Now</button>
+                <p id="message"></p>
+                <button type="submit" class="btn btn-success btn-lg btn-block">Register
+                    Now</button>
+                <p>{{msg}}</p>
             </div>
         </form>
         <div class="text-center">Already have an account? <a href="signin">Sign in</a></div>
