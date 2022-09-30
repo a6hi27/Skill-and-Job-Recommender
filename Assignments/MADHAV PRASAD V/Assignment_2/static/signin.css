@@ -6,7 +6,10 @@
 
 body {
     max-width: 100%;
-    overflow: hidden;
+    min-height: 100vh;
+    position:relative;
+    z-index:1;
+    margin: 0 auto;
     background-image:
         linear-gradient(rgba(255, 0, 200, 0.884), #59e6ff);
 }
@@ -20,7 +23,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.18);
     width: 400px;
     height: 450px;
-    margin: 100px auto;
+    margin: 160px auto;
     padding: 30px 0;
     background-color: transparent;
 }
