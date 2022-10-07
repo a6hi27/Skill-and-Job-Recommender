@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+   window.watsonAssistantChatOptions = {
+     integrationID: "08de062c-3875-4731-b4ee-5066c18a5afb", // The ID of this integration.
+     region: "jp-tok", // The region your integration is hosted in.
+     serviceInstanceID: "e37d14e0-da3a-40c0-869e-51d7184f2928", // The ID of your service instance.
+     onLoad: function(instance) { instance.render(); }
+   };
+   setTimeout(function(){
+     const t=document.createElement('script');
+     t.src="https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + (window.watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
+     document.head.appendChild(t);
+   });
+ </script>
+
+</html>
