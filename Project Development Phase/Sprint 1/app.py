@@ -28,6 +28,11 @@ def signin():
     return render_template("signin.html")
 
 
+@app.route("/verification")
+def verfication():
+    return render_template("verification.html")
+
+
 @app.route("/aboutus")
 def aboutus():
     return render_template("aboutus.html")
