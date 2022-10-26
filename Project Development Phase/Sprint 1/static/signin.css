@@ -12,10 +12,23 @@
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     width: 400px;
-    margin: 0 auto;
-    padding: 30px 0;
+    margin: 75px auto;
+    padding: 30px 30px;
     background-color: transparent;
     color: aliceblue;
+}
+
+.card-header {
+    padding: 0.75rem 1.25rem;
+    background-color: transparent !important;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+}
+
+.card-footer {
+    padding: 0.75rem 1.25rem;
+    background-color: transparent !important;
+    border-top: 1px solid rgba(0, 0, 0, .125);
 }
 
 .remember {
