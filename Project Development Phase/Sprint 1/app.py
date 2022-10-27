@@ -1,4 +1,3 @@
-import email
 from flask import Flask, render_template, request
 import ibm_db
 from flask_mail import Mail, Message
@@ -18,7 +17,13 @@ app.config['MAIL_PASSWORD'] = 'nxgknupghjjodabq'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
+
+
 otp = randint(000000, 999999)
+first_name = ""
+last_name = ""
+useremail = ""
+password = ""
 
 
 @app.route("/")
@@ -26,28 +31,35 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route('/verification', methods=["POST"])
+@app.route('/verification', methods=["POST", "GET"])
 def verify():
     if request.method == 'POST':
-
         global first_name
         global last_name
-        global useremail
         global password
-
+        global useremail
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         useremail = request.form.get('email')
         password = request.form.get('password')
-
         sql = "SELECT * FROM User WHERE email =?"
         stmt = ibm_db.prepare(connection, sql)
         ibm_db.bind_param(stmt, 1, useremail)
         ibm_db.execute(stmt)
         account = ibm_db.fetch_assoc(stmt)
 
-    if account:
-        return render_template('signup.html', msg="You are already a member, please login using your details")
+        if account:
+            return render_template('signup.html', alreadymsg="You are already a member, please login using your details")
+    else:
+        global otp
+        otp = randint(000000, 999999)
+        email = useremail
+        msg = Message(subject='OTP', sender='hackjacks@gmail.com',
+                      recipients=[email])
+        msg.body = "You have succesfully registered on hackjacks!\nUse the OTP given below to verify your email ID.\n\t" + \
+            str(otp)
+        mail.send(msg)
+        return render_template('verification.html', resendmsg="OTP has been resent")
 
     email = request.form['email']
     msg = Message(subject='OTP', sender='hackjacks@gmail.com',
@@ -60,6 +72,7 @@ def verify():
 
 @app.route('/validate', methods=['POST'])
 def validate():
+    global otp
     user_otp = request.form['otp']
     if otp == int(user_otp):
 

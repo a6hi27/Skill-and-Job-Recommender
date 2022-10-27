@@ -71,7 +71,7 @@ li {
 
 ul {
 
-    margin-bottom: 70px
+    margin-bottom: 30px;
 }
 
 h2 {
@@ -92,5 +92,11 @@ a {
     font-size: larger;
     text-align: center;
     color: red;
+    font-weight: bolder;
+}
+
+.resend {
+    text-align: center;
+    font-size: larger;
     font-weight: bolder;
 }
