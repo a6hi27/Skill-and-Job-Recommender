@@ -25,6 +25,16 @@
     border-bottom: 1px solid rgba(0, 0, 0, .125);
 }
 
+button.btn.btn-primary {
+    margin-bottom: 5px;
+}
+
+button.btn.btn-primary-google {
+    background-color: rgb(255 0 0);
+    border-color: rgba(234, 59, 59, 0.79);
+    color: aliceblue;
+}
+
 .card-footer {
     padding: 0.75rem 1.25rem;
     background-color: transparent !important;
@@ -33,4 +43,8 @@
 
 .remember {
     padding-left: 1em;
+}
+
+a {
+    color: #181729ed
 }
