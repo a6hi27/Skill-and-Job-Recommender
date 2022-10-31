@@ -1,36 +1,64 @@
 * {
-    font-family: 'Playfair Display', serif;
-  }
+  font-family: 'Playfair Display', serif;
+}
 
-  .boxed {
-    background-color: rgba(0, 0, 0, 0.5);
-    width: 700px;
-    height: 350px;
-    margin: 120px auto;
-    border-radius: 25px;
-  }
+.boxed {
+  background-color: rgba(255, 255, 255, 1);
+  width: 80%;
+  height: 369px;
+  margin: 80px auto;
+  border-radius: 25px;
+}
 
-  .logo {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 50%;
-  }
+.logo {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 50%;
+}
 
-  .home {
-    color: aliceblue;
-    text-align: center;
-    text-decoration: underline;
-    font-size: 30px;
-    width: 100%;
-  }
+.home {
+  color: aliceblue;
+  text-align: center;
+  text-decoration: underline;
+  font-size: 30px;
+  width: 100%;
+}
 
-  .text {
-    color: aliceblue;
-    text-align: center;
-    font-size: large;
-    font-weight: bold;
-    font-style: italic;
-    margin: 0% 10% 0% 10%;
-    width: 80%;
-  }
+.text {
+  color: aliceblue;
+  text-align: center;
+  font-size: large;
+  font-weight: bold;
+  font-style: italic;
+  margin: 0% 10% 0% 10%;
+  width: 80%;
+}
+
+input.searchbar {
+  width: 75%;
+  border-radius: 25px;
+  padding: 5px
+}
+
+input.submitbtn {
+  margin-left: 15px;
+  border-radius: 25px;
+  padding: 5px;
+}
+
+.search {
+  width: 50%;
+  position: absolute;
+  margin-left: 130px;
+  margin-top: 30px;
+  overflow: auto;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+
+
+body {
+  background: url('Images/Building.jpg') no-repeat center;
+}

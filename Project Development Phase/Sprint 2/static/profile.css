@@ -46,10 +46,6 @@
     border: solid 1px #BA68C8
 }
 
-body {
-    background: url('Images/Building.jpg') no-repeat center;
-}
-
 .container.rounded.bg-white.mt-5.mb-5 {
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     backdrop-filter: blur(1px);
@@ -70,4 +66,8 @@ label.labels {
 
 select {
     width: 100%;
+}
+
+body {
+    background: url('Images/Building.jpg') no-repeat center;
 }
