@@ -18,7 +18,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
-
+GOOGLE_CLIENT_ID =""
 otp = randint(000000, 999999)
 first_name = ""
 last_name = ""

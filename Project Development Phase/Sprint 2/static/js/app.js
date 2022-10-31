@@ -1,38 +1,68 @@
-var req = unirest("GET", "https://www.universal-tutorial.com/api/getaccesstoken");
-
-req.headers({
-    "Accept": "application/json",
-    "api-token": "d6OnmrD9Lydl9-d2C14o0cDnqv2M4SO5qhJu1zklHwxUde9A4m85xnuV5nd3QksvEew",
-    "user-email": "2k19cse001@kiot.ac.in"
-});
-document.addEventListener("DOMContentLoaded", () => {
-
-    const selectDrop = document.querySelector('#countries');
-    let countries = document.getElementById("countries")
-    let countryName = countries.value;
-    let finalURL = `https://restcountries.com/v3.1/all`;
-    console.log(finalURL);
-    fetch(finalURL)
-        .then((response) => response.json())
-        .then((data) => {
-            let output = "";
-
-            data.forEach(country => {
-                output += `<option value="${country.name.common}">${country.name.common}</option>`
-            });
-
-            //   console.log(Object.keys(data[0].currencies)[0]);
-            //   console.log(data[0].currencies[Object.keys(data[0].currencies)].name);
-            //   console.log(
-            //     Object.values(data[0].languages).toString().split(",").join(", ")
-            //   );
-            selectDrop.innerHTML = output
-        })
-        .catch(() => {
-            if (countryName.length == 0) {
-                result.innerHTML = `<h3>The input field cannot be empty</h3>`;
-            } else {
-                result.innerHTML = `<h3>Please enter a valid country name.</h3>`;
+document.addEventListener('DOMContentLoaded', () => {
+    let auth_token;
+    $(document).ready(function () {
+        $.ajax({
+            type: 'get',
+            url: 'https://www.universal-tutorial.com/api/getaccesstoken',
+            success: function (data) {
+                auth_token = data.auth_token
+                getCountry(data.auth_token);
+            },
+            error: function (error) {
+                console.log(error);
+            },
+            headers: {
+                "Accept": "application/json",
+                "api-token": "d6OnmrD9Lydl9-d2C14o0cDnqv2M4SO5qhJu1zklHwxUde9A4m85xnuV5nd3QksvEew",
+                "user-email": "2k19cse001@kiot.ac.in"
             }
-        });
+
+        })
+        $('#countries').change(function () {
+            getState();
+        })
+    })
+    function getCountry(auth_token) {
+        $.ajax({
+            type: 'get',
+            url: 'https://www.universal-tutorial.com/api/countries/',
+            success: function (data) {
+                data.forEach(element => {
+                    $('#countries').append('<option value="' + element.country_name + '">' + element.country_name + '</option>');
+                });
+                //getState(auth_token)
+            },
+            error: function (error) {
+                console.log(error);
+            },
+            headers: {
+                "Authorization": "Bearer " + auth_token,
+                "Accept": "application/json"
+            }
+
+        })
+    }
+    function getState() {
+        let country_name = $('#countries').val();
+        $.ajax({
+            type: 'get',
+            url: 'https://www.universal-tutorial.com/api/states/' + country_name,
+            success: function (data) {
+                $('#states').empty();
+                data.forEach(element => {
+                    $('#states').append('<option value="' + element.state_name + '">' + element.state_name + '</option>');
+                });
+                //getCity(auth_token);
+            },
+            error: function (error) {
+                console.log(error);
+            },
+            headers: {
+                "Authorization": "Bearer " + auth_token,
+                "Accept": "application/json"
+            }
+
+        })
+    }
+
 });

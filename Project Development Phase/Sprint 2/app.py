@@ -185,6 +185,9 @@ def signup1():
 def home():
     return render_template("index.html")
 
+@app.route("/profile")
+def profile():
+    return render_template("profile.html")
 
 @app.route("/signin")
 def signin():
@@ -210,7 +213,7 @@ def login():
 
         if account:
             if (password == str(account['PASS']).strip()):
-                return render_template('index.html')
+                return render_template('profile.html')
             else:
                 return render_template('signin.html', msg="Password is invalid")
         else:
