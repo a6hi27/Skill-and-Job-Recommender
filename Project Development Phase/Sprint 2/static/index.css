@@ -2,12 +2,8 @@
   font-family: 'Playfair Display', serif;
 }
 
-.boxed {
-  background-color: rgba(255, 255, 255, 1);
-  width: 80%;
-  height: 369px;
-  margin: 80px auto;
-  border-radius: 25px;
+.navbar-wrapper{ 
+  width: 100%;
 }
 
 .logo {
@@ -38,27 +34,46 @@
 input.searchbar {
   width: 75%;
   border-radius: 25px;
-  padding: 5px
+  padding: 6px
 }
 
 input.submitbtn {
   margin-left: 15px;
   border-radius: 25px;
-  padding: 5px;
+  padding: 6px;
 }
 
 .search {
   width: 50%;
-  position: absolute;
-  margin-left: 130px;
-  margin-top: 30px;
+  /* margin-left: 130px;
+  margin-top: 30px; */
   overflow: auto;
   border-radius: 5px;
   -webkit-border-radius: 5px;
+}
+
+form.search-form{
+  margin-left: 20px;
+}
+
+.boxed {
+  background-color: rgba(255, 255, 255, 1);
+  width: 80%;
+  height: 100%;
+  flex: 1;
+  margin: 24px auto;
+  padding: 20px;
+  border-radius: 25px;
 }
 
 
 
 body {
   background: url('Images/Building.jpg') no-repeat center;
+  height: 100vh;
+  background-position: 100% 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* align-items: flex-start; */
 }
