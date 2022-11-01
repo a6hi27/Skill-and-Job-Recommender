@@ -2,143 +2,125 @@
 <html lang="en">
 
 <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Profile</title>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="../static/profile.css">
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Profile</title>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../static/profile.css">
 </head>
 
 <body>
-        <form action="/profile" method="post">
-                <script src="../static//js/app.js"></script>
-                <div class="container rounded bg-white mt-5 mb-5">
-                        <div class="row">
-                                <div class="col-md-3 border-right">
-                                        <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img
-                                                        class="rounded-circle mt-5" width="150px"
-                                                        src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"><span
-                                                        class="font-weight-bold">Edogaru</span><span
-                                                        class="text-black-50">edogaru@mail.com.my</span><span> </span>
-                                        </div>
-                                </div>
-                                <div class="col-md-5 border-right">
-                                        <div class="p-3 py-5">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <h4 class="text-right">Profile</h4>
-                                                </div>
-                                                <div class="row mt-2">
-                                                        <div class="col-md-6"><label class="labels">First Name</label><input
-                                                                        type="text" class="form-control"
-                                                                        placeholder="First name" name="first_name"
-                                                                        required>
-                                                        </div>
-                                                        <div class="col-md-6"><label
-                                                                        class="labels">Lastname</label><input
-                                                                        type="text" class="form-control"
-                                                                        name="last_name" placeholder="Lastname"
-                                                                        required></div>
-                                                </div>
-                                                <div class="row mt-3">
-                                                        <div class="col-md-12"><label class="labels">Mobile
-                                                                        Number</label><input type="text"
-                                                                        class="form-control"
-                                                                        placeholder="Enter phone number"
-                                                                        name="mobile_no" required></div>
-                                                        <div class="col-md-12"><label class="labels">Address Line
-                                                                        1</label><input type="text" class="form-control"
-                                                                        placeholder="Enter address line 1"
-                                                                        name="address_line_1" required></div>
-                                                        <div class="col-md-12"><label class="labels">Address Line
-                                                                        2</label><input type="text" class="form-control"
-                                                                        placeholder="Enter address line 2"
-                                                                        name="address_line_2"></div>
-                                                        <div class="col-md-12"><label
-                                                                        class="labels">Zipcode</label><input type="text"
-                                                                        class="form-control" placeholder="Zipcode"
-                                                                        name="zipcode" required></div>
-                                                        <div class="col-md-12"><label class="labels">City</label><input
-                                                                        type="text" class="form-control"
-                                                                        placeholder="Enter City" name="city" required>
-                                                        </div>
-                                                        <div class="col-md-12"><label class="labels">Email
-                                                                        ID</label><input type="text"
-                                                                        class="form-control"
-                                                                        placeholder="Enter email id" name="pemail" required></div>
-                                                        <div class="col-md-12"><label
-                                                                        class="labels">Education</label><select
-                                                                        id="education" name="education" required>
-                                                                        <option value="">--Select Education--</option>
-                                                                        <option value="cse">B.E CSE</option>
-                                                                        <option value="eee">B.E EEE</option>
-                                                                        <option value="ece">B.E ECE</option>
-                                                                        <option value="mech">B.E Mech</option>
-                                                                        <option value="civil">B.E Civil</option>
-                                                                </select>
-                                                        </div>
-                                                </div>
-                                                <div class="row mt-3">
-                                                        <div class="col-md-6"><label
-                                                                        class="labels">Country</label><select
-                                                                        id="countries" name="countries" required>
-                                                                        <option value="" required>--Select Country--
-                                                                        </option>
-                                                                </select></div>
-                                                        <div class="col-md-6"><label class="labels">State</label><select
-                                                                        id="states" name="states" required>
-                                                                        <option value="">--Select State--</option>
-                                                                </select></div>
-                                                </div>
-                                                <div class="mt-5 text-center"><button
-                                                                class="btn btn-primary profile-button"
-                                                                type="submit">Save
-                                                                Profile</button></div>
-                                        </div>
-                                </div>
-                                <div class="col-md-4">
-                                        <div class="p-3 py-5">
-                                                <div
-                                                        class="d-flex justify-content-between align-items-center experience">
-                                                </div><br>
-                                                <div class="col-md-12"><label class="labels">Experience</label><select
-                                                                id="education" name="experience" required>
-                                                                <option value="">--Years of Experience--</option>
-                                                                <option value="0">0</option>
-                                                                <option value="1">1</option>
-                                                                <option value="2">2</option>
-                                                                <option value="3">2+</option>
-                                                        </select></div> <br>
-                                                <div class="col-md-12"><label class="labels">Job Title</label><select
-                                                                id="job_title" name="job_title" required>
-                                                                <option value="">--Select a job title--</option>
-                                                                <option value="Software Developer">Software Developer
-                                                                </option>
-                                                                <option value="Web Developer">Web Developer</option>
-                                                                <option value="Full Stack Developer">Full Stack
-                                                                        Developer
-                                                                </option>
-                                                                <option value="UI/UX Designer">UI/UX Designer</option>
-                                                                <option value=".NET Developer">.NET Developer</option>
-                                                                <option value="Firmware Engineer">Firmware Engineer
-                                                                </option>
-                                                                <option value="Senior Software Developer">Senior
-                                                                        Software
-                                                                        Developer </option>
-                                                                <option value="Embedded System Engineer">Embedded System
-                                                                        Engineer</option>
-                                                        </select>
+	<form action="/profile" method="post">
+		<script src="../static//js/app.js"></script>
+		<div class="container rounded bg-white mt-5 mb-5">
+			<div class="row">
+				<div class="col-md-3 border-right">
+					<div class="d-flex flex-column align-items-center text-center p-3 py-5"><img
+							class="rounded-circle mt-5" width="150px"
+							src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"><span
+							class="font-weight-bold">Edogaru</span><span
+							class="text-black-50">edogaru@mail.com.my</span><span> </span>
+					</div>
+				</div>
+				<div class="col-md-5 border-right">
+					<div class="p-3 py-5">
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<h4 class="text-right">Profile</h4>
+						</div>
+						<div class="row mt-2">
+							<div class="col-md-6"><label class="labels">First Name</label><input type="text"
+									class="form-control" placeholder="First name" name="first_name" required>
+							</div>
+							<div class="col-md-6"><label class="labels">Lastname</label><input type="text"
+									class="form-control" name="last_name" placeholder="Lastname" required></div>
+						</div>
+						<div class="row mt-3">
+							<div class="col-md-12"><label class="labels">Mobile
+									Number</label><input type="text" class="form-control"
+									placeholder="Enter phone number" name="mobile_no" required></div>
+							<div class="col-md-12"><label class="labels">Address Line
+									1</label><input type="text" class="form-control" placeholder="Enter address line 1"
+									name="address_line_1" required></div>
+							<div class="col-md-12"><label class="labels">Address Line
+									2</label><input type="text" class="form-control" placeholder="Enter address line 2"
+									name="address_line_2"></div>
+							<div class="col-md-12"><label class="labels">Zipcode</label><input type="text"
+									class="form-control" placeholder="Zipcode" name="zipcode" required></div>
+							<div class="col-md-12"><label class="labels">City</label><input type="text"
+									class="form-control" placeholder="Enter City" name="city" required>
+							</div>
+							<div class="col-md-12"><label class="labels">Email
+									ID</label><input type="text" class="form-control" name="email" value="{{email}}" required disabled>
+							</div>
+							<div class="col-md-12"><label class="labels">Education</label><select id="education"
+									name="education" required>
+									<option value="">--Select Education--</option>
+									<option value="cse">B.E CSE</option>
+									<option value="eee">B.E EEE</option>
+									<option value="ece">B.E ECE</option>
+									<option value="mech">B.E Mech</option>
+									<option value="civil">B.E Civil</option>
+								</select>
+							</div>
+						</div>
+						<div class="row mt-3">
+							<div class="col-md-6"><label class="labels">Country</label><select id="countries"
+									name="countries" required>
+									<option value="" required>--Select Country--
+									</option>
+								</select></div>
+							<div class="col-md-6"><label class="labels">State</label><select id="states" name="states"
+									required>
+									<option value="">--Select State--</option>
+								</select></div>
+						</div>
+						<div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="submit">Save
+								Profile</button></div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="p-3 py-5">
+						<div class="d-flex justify-content-between align-items-center experience">
+						</div><br>
+						<div class="col-md-12"><label class="labels">Experience</label><select id="education"
+								name="experience" required>
+								<option value="">--Years of Experience--</option>
+								<option value="0">0</option>
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">2+</option>
+							</select></div> <br>
+						<div class="col-md-12"><label class="labels">Job Title</label><select id="job_title"
+								name="job_title" required>
+								<option value="">--Select a job title--</option>
+								<option value="Software Developer">Software Developer
+								</option>
+								<option value="Web Developer">Web Developer</option>
+								<option value="Full Stack Developer">Full Stack
+									Developer
+								</option>
+								<option value="UI/UX Designer">UI/UX Designer</option>
+								<option value=".NET Developer">.NET Developer</option>
+								<option value="Firmware Engineer">Firmware Engineer
+								</option>
+								<option value="Senior Software Developer">Senior
+									Software
+									Developer </option>
+								<option value="Embedded System Engineer">Embedded System
+									Engineer</option>
+							</select>
 
 
-                                                </div>
-                                        </div>
-                                </div>
-                        </div>
-                </div>
-        </form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
 </body>
 
 </html>

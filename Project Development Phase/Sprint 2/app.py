@@ -13,17 +13,18 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 
-connectionstring = "DATABASE=bludb;HOSTNAME=3883e7e4-18f5-4afe-be8c-fa31c41761d2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31498;PROTOCOL=TCPIP;UID=kmy46098;PWD=PN0aG7meNBbB7HH1;SECURITY=SSL;"
+connectionstring = "DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31864;PROTOCOL=TCPIP;UID=mzh43207;PWD=pLYMGfSprZntFyaz;SECURITY=SSL;"
+
 connection = ibm_db.connect(connectionstring, '', '')
-useremail = ""
 app = Flask(__name__)
 mail = Mail(app)
 app.secret_key = "HireMe.com"
+useremail = ""
 
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 465
 app.config["MAIL_USERNAME"] = '2k19cse052@kiot.ac.in'
-app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_PASSWORD'] = 'cmftbjelijkyumuy'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
@@ -42,6 +43,7 @@ flow = Flow.from_client_secrets_file(
 )"""
 
 
+@app.route("/signup")
 @app.route("/")
 def signup():
     return render_template("signup.html")
@@ -79,7 +81,7 @@ def verify():
             email = request.form['email']
             msg = Message(subject='OTP', sender='hackjacks@gmail.com',
                           recipients=[email])
-            msg.body = "You have succesfully registered on Hire Me!\nUse the OTP given below to verify your email ID.\n\t\t" + \
+            msg.body = "You have succesfully registered for Hire Me!\nUse the OTP given below to verify your email ID.\n\t\t" + \
                 str(otp)
             mail.send(msg)
             return render_template('verification.html')
@@ -96,6 +98,7 @@ def verify():
 
 @app.route('/validate', methods=['POST'])
 def validate():
+    global useremail
     user_otp = request.form['otp']
     if otp == int(user_otp):
         insert_sql = "INSERT INTO User VALUES (?,?,?,?,?)"
@@ -180,11 +183,6 @@ def logout():
     return redirect("/signin")
 
 
-@app.route("/signup")
-def signup1():
-    return render_template("signup.html")
-
-
 @app.route("/home")
 def home():
     return render_template("index.html")
@@ -193,6 +191,7 @@ def home():
 @app.route("/signin")
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    global useremail
     if request.method == 'POST':
         useremail = request.form.get('email')
         password = request.form.get('password')
@@ -218,6 +217,7 @@ def login():
 
 @app.route("/profile", methods=["POST", "GET"])
 def profile():
+    global useremail
     if (request.method == "POST"):
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -226,7 +226,6 @@ def profile():
         address_line_2 = request.form.get('address_line_2')
         zipcode = request.form.get('zipcode')
         city = request.form.get('city')
-        pemail = request.form.get('pemail')
         education = request.form.get('education')
         country = request.form.get('countries')
         state = request.form.get('states')
@@ -242,7 +241,7 @@ def profile():
         ibm_db.bind_param(prep_stmt, 5, address_line_2)
         ibm_db.bind_param(prep_stmt, 6, zipcode)
         ibm_db.bind_param(prep_stmt, 7, city)
-        ibm_db.bind_param(prep_stmt, 8, pemail)
+        ibm_db.bind_param(prep_stmt, 8, email)
         ibm_db.bind_param(prep_stmt, 9, education)
         ibm_db.bind_param(prep_stmt, 10, country)
         ibm_db.bind_param(prep_stmt, 11, state)
@@ -250,11 +249,10 @@ def profile():
         ibm_db.bind_param(prep_stmt, 13, job_title)
         ibm_db.execute(prep_stmt)
 
-        insert_sql = "UPDATE USER SET newuser = false WHERE email='?'"
+        insert_sql = "UPDATE USER SET newuser = false WHERE email=?"
         prep_stmt = ibm_db.prepare(connection, insert_sql)
-        global useremail
         ibm_db.bind_param(prep_stmt, 1, useremail)
         ibm_db.execute(prep_stmt)
         return render_template('index.html')
     else:
-        return render_template('profile.html')
+        return render_template('profile.html', email=useremail)
