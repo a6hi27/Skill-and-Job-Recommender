@@ -34,7 +34,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 consumer_key = ''
 consumer_secret = ''
-tcallback = ''
+tcallback = 'http://127.0.0.1:5000/tcallback'
 
 GOOGLE_CLIENT_ID = ""
 client_secrets_file = os.path.join(
@@ -248,6 +248,7 @@ def login():
 def profile():
     global newuser
     global useremail
+    global first_name
     if (request.method == "POST"):
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -291,4 +292,15 @@ def profile():
         ibm_db.execute(stmt)
         account = ibm_db.fetch_assoc(stmt)
         first_name = account['FIRST_NAME']
-        return render_template('profile.html', email=useremail, newuser=newuser, first_name=first_name)
+        last_name = account['LAST_NAME']
+        mobile_no = account['MOBILE_NUMBER']
+        address_line_1 = account['ADDRESS_LINE_1']
+        address_line_2 = account['ADDRESS_LINE_2']
+        zipcode = account['ZIPCODE']
+        education = account['EDUCATION']
+        countries = account['COUNTRY']
+        states = account['STATEE']
+        city = account['CITY']
+        experience = account['EXPERIENCE']
+        job_title = account['JOB_TITLE']
+        return render_template('profile.html', email=useremail, newuser=newuser, first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
