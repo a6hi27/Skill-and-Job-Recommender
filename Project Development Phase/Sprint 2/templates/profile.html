@@ -14,6 +14,25 @@
 </head>
 
 <body>
+	{% if newuser==0 %}
+	<div class="navbar-wrapper fixed">
+		<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+			<a class="navbar-brand text-dark h5" href="/home">Hire Me!</a>
+			<div class="collapse navbar-collapse" id="navbarNavDropdown">
+				<ul class="navbar-nav">
+					<li class="nav-item active">
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-dark h5" href="profile">Profile</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-dark h5" href="logout">Logout</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+	{% endif %}
 	<form action="/profile" method="post">
 		<script src="../static//js/app.js"></script>
 		<div class="container rounded bg-white mt-5 mb-5">
@@ -33,7 +52,8 @@
 						</div>
 						<div class="row mt-2">
 							<div class="col-md-6"><label class="labels">First Name</label><input type="text"
-									class="form-control" placeholder="First name" name="first_name" required>
+									class="form-control" placeholder="First name" name="first_name" value="{% if newuser==0 %}
+									{{first_name}}{%end if%}" required disabled>
 							</div>
 							<div class="col-md-6"><label class="labels">Lastname</label><input type="text"
 									class="form-control" name="last_name" placeholder="Lastname" required></div>
@@ -54,7 +74,8 @@
 									class="form-control" placeholder="Enter City" name="city" required>
 							</div>
 							<div class="col-md-12"><label class="labels">Email
-									ID</label><input type="text" class="form-control" name="email" value="{{email}}" required disabled>
+									ID</label><input type="text" class="form-control" name="email" value="{{email}}"
+									required disabled>
 							</div>
 							<div class="col-md-12"><label class="labels">Education</label><select id="education"
 									name="education" required>

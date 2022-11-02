@@ -1,12 +1,11 @@
-from ast import boolop
-from xmlrpc.client import boolean
-from flask import Flask, g, render_template, request
+from flask import Flask, render_template, request
 import ibm_db
 from flask_mail import Mail, Message
 from random import randint
 import os
 import pathlib
 import requests
+import tweepy
 from flask import Flask, session, abort, redirect, request
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
@@ -20,18 +19,24 @@ app = Flask(__name__)
 mail = Mail(app)
 app.secret_key = "HireMe.com"
 useremail = ""
+newuser = None
+
 
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 465
 app.config["MAIL_USERNAME"] = '2k19cse052@kiot.ac.in'
-app.config['MAIL_PASSWORD'] = 'cmftbjelijkyumuy'
+app.config['MAIL_PASSWORD'] = ''
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-"""GOOGLE_CLIENT_ID = ""
+consumer_key = ''
+consumer_secret = ''
+tcallback = ''
+
+GOOGLE_CLIENT_ID = ""
 client_secrets_file = os.path.join(
     pathlib.Path(__file__).parent, "client_secret.json")
 
@@ -40,7 +45,7 @@ flow = Flow.from_client_secrets_file(
     scopes=["https://www.googleapis.com/auth/userinfo.profile",
             "https://www.googleapis.com/auth/userinfo.email", "openid"],
     redirect_uri="http://127.0.0.1:5000/callback"
-)"""
+)
 
 
 @app.route("/signup")
@@ -59,13 +64,11 @@ def verify():
         global password
         global email
         global otp
-        global newuser
 
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         useremail = request.form.get('email')
         password = request.form.get('password')
-        newuser = 1
 
         sql = "SELECT * FROM User WHERE email =?"
         stmt = ibm_db.prepare(connection, sql)
@@ -101,13 +104,12 @@ def validate():
     global useremail
     user_otp = request.form['otp']
     if otp == int(user_otp):
-        insert_sql = "INSERT INTO User VALUES (?,?,?,?,?)"
+        insert_sql = "INSERT INTO User(first_name,last_name,email,pass) VALUES (?,?,?,?)"
         prep_stmt = ibm_db.prepare(connection, insert_sql)
         ibm_db.bind_param(prep_stmt, 1, first_name)
         ibm_db.bind_param(prep_stmt, 2, last_name)
         ibm_db.bind_param(prep_stmt, 3, useremail)
         ibm_db.bind_param(prep_stmt, 4, password)
-        ibm_db.bind_param(prep_stmt, 5, newuser)
         ibm_db.execute(prep_stmt)
         return render_template('signin.html')
 
@@ -115,7 +117,6 @@ def validate():
         return render_template('verification.html', msg="OTP is invalid. Please enter a valid OTP")
 
 
-"""
 @app.route("/googlelogin")
 def googlelogin():
     authorization_url, state = flow.authorization_url()
@@ -163,18 +164,45 @@ def callback():
     account = ibm_db.fetch_assoc(stmt)
 
     if account:
-        return redirect("/home")
+        if (account['NEWUSER'] == 1):
+            return redirect('/profile')
+        return redirect('/home')
 
     else:
-        insert_sql = "INSERT INTO User VALUES (?,?,?,?)"
+
+        insert_sql = "INSERT INTO User(first_name,last_name,email,pass) VALUES (?,?,?,?)"
         prep_stmt = ibm_db.prepare(connection, insert_sql)
         ibm_db.bind_param(prep_stmt, 1, first_name)
         ibm_db.bind_param(prep_stmt, 2, last_name)
         ibm_db.bind_param(prep_stmt, 3, useremail)
         ibm_db.bind_param(prep_stmt, 4, password)
         ibm_db.execute(prep_stmt)
-        return redirect("/home")
-"""
+        return redirect("/profile")
+
+
+@app.route('/tlogin')
+def auth():
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret, tcallback)
+    url = auth.get_authorization_url()
+    session['request_token'] = auth.request_token
+    return redirect(url)
+
+
+@app.route('/tcallback')
+def twitter_callback():
+
+    global first_name
+    request_token = session['request_token']
+    print(request_token)
+    del session['request_token']
+
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret, tcallback)
+    auth.request_token = request_token
+    verifier = request.args.get('oauth_verifier')
+    auth.get_access_token(verifier)
+    session['token'] = (auth.access_token, auth.access_token_secret)
+    first_name = session['token']
+    return redirect('/profile')
 
 
 @app.route("/logout")
@@ -192,6 +220,7 @@ def home():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     global useremail
+    global newuser
     if request.method == 'POST':
         useremail = request.form.get('email')
         password = request.form.get('password')
@@ -200,7 +229,7 @@ def login():
         ibm_db.bind_param(stmt, 1, useremail)
         ibm_db.execute(stmt)
         account = ibm_db.fetch_assoc(stmt)
-
+        newuser = account['NEWUSER']
         if account:
             if (password == str(account['PASS']).strip()):
                 # return redirect('/profile')
@@ -217,6 +246,7 @@ def login():
 
 @app.route("/profile", methods=["POST", "GET"])
 def profile():
+    global newuser
     global useremail
     if (request.method == "POST"):
         first_name = request.form.get('first_name')
@@ -241,7 +271,7 @@ def profile():
         ibm_db.bind_param(prep_stmt, 5, address_line_2)
         ibm_db.bind_param(prep_stmt, 6, zipcode)
         ibm_db.bind_param(prep_stmt, 7, city)
-        ibm_db.bind_param(prep_stmt, 8, email)
+        ibm_db.bind_param(prep_stmt, 8, useremail)
         ibm_db.bind_param(prep_stmt, 9, education)
         ibm_db.bind_param(prep_stmt, 10, country)
         ibm_db.bind_param(prep_stmt, 11, state)
@@ -255,4 +285,10 @@ def profile():
         ibm_db.execute(prep_stmt)
         return render_template('index.html')
     else:
-        return render_template('profile.html', email=useremail)
+        sql = "SELECT * FROM profile WHERE email_id =?"
+        stmt = ibm_db.prepare(connection, sql)
+        ibm_db.bind_param(stmt, 1, useremail)
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+        first_name = account['FIRST_NAME']
+        return render_template('profile.html', email=useremail, newuser=newuser, first_name=first_name)
