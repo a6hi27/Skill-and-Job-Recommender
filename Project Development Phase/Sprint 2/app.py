@@ -16,6 +16,9 @@ connectionstring = "DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660
 
 connection = ibm_db.connect(connectionstring, '', '')
 app = Flask(__name__)
+app.debug = True
+
+
 mail = Mail(app)
 app.secret_key = "HireMe.com"
 useremail = ""
@@ -229,10 +232,9 @@ def login():
         ibm_db.bind_param(stmt, 1, useremail)
         ibm_db.execute(stmt)
         account = ibm_db.fetch_assoc(stmt)
-        newuser = account['NEWUSER']
         if account:
+            newuser = account['NEWUSER']
             if (password == str(account['PASS']).strip()):
-                # return redirect('/profile')
                 if (account['NEWUSER'] == 1):
                     return redirect('/profile')
                 return redirect('/home')
@@ -249,6 +251,12 @@ def profile():
     global newuser
     global useremail
     global first_name
+    select_sql = "SELECT * FROM user where email= ?"
+    prep_stmt = ibm_db.prepare(connection, select_sql)
+    ibm_db.bind_param(prep_stmt, 1, useremail)
+    ibm_db.execute(prep_stmt)
+    account = ibm_db.fetch_assoc(prep_stmt)
+    pemail = account['EMAIL']
     if (request.method == "POST"):
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -263,7 +271,13 @@ def profile():
         experience = request.form.get('experience')
         job_title = request.form.get('job_title')
 
+        select_sql = "SELECT * FROM profile where email_id = ?"
+        prep_stmt = ibm_db.prepare(connection, select_sql)
+        ibm_db.bind_param(prep_stmt, 1, useremail)
+        ibm_db.execute(prep_stmt)
+
         insert_sql = "INSERT INTO profile VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+
         prep_stmt = ibm_db.prepare(connection, insert_sql)
         ibm_db.bind_param(prep_stmt, 1, first_name)
         ibm_db.bind_param(prep_stmt, 2, last_name)
@@ -284,23 +298,27 @@ def profile():
         prep_stmt = ibm_db.prepare(connection, insert_sql)
         ibm_db.bind_param(prep_stmt, 1, useremail)
         ibm_db.execute(prep_stmt)
-        return render_template('index.html')
+        return render_template('index.html', newuser=newuser)
     else:
-        sql = "SELECT * FROM profile WHERE email_id =?"
-        stmt = ibm_db.prepare(connection, sql)
-        ibm_db.bind_param(stmt, 1, useremail)
-        ibm_db.execute(stmt)
-        account = ibm_db.fetch_assoc(stmt)
-        first_name = account['FIRST_NAME']
-        last_name = account['LAST_NAME']
-        mobile_no = account['MOBILE_NUMBER']
-        address_line_1 = account['ADDRESS_LINE_1']
-        address_line_2 = account['ADDRESS_LINE_2']
-        zipcode = account['ZIPCODE']
-        education = account['EDUCATION']
-        countries = account['COUNTRY']
-        states = account['STATEE']
-        city = account['CITY']
-        experience = account['EXPERIENCE']
-        job_title = account['JOB_TITLE']
-        return render_template('profile.html', email=useremail, newuser=newuser, first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
+        if (newuser == 0):
+            sql = "SELECT * FROM profile WHERE email_id =?"
+            stmt = ibm_db.prepare(connection, sql)
+            ibm_db.bind_param(stmt, 1, useremail)
+            ibm_db.execute(stmt)
+            account = ibm_db.fetch_assoc(stmt)
+            first_name = account['FIRST_NAME']
+            last_name = account['LAST_NAME']
+            mobile_no = account['MOBILE_NUMBER']
+            pemail = account['EMAIL_ID']
+            address_line_1 = account['ADDRESS_LINE_1']
+            address_line_2 = account['ADDRESS_LINE_2']
+            zipcode = account['ZIPCODE']
+            education = account['EDUCATION']
+            countries = account['COUNTRY']
+            states = account['STATEE']
+            city = account['CITY']
+            experience = account['EXPERIENCE']
+            job_title = account['JOB_TITLE']
+            return render_template('profile.html', email=pemail, newuser=newuser, first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
+        else:
+            return render_template('profile.html', email=pemail, newuser=newuser)
