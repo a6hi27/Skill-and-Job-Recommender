@@ -22,6 +22,9 @@ app.debug = True
 mail = Mail(app)
 app.secret_key = "HireMe.com"
 useremail = ""
+first_name = ""
+last_name = ""
+password = ""
 newuser = None
 
 
@@ -104,6 +107,9 @@ def verify():
 
 @app.route('/validate', methods=['POST'])
 def validate():
+    global first_name
+    global last_name
+    global password
     global useremail
     user_otp = request.form['otp']
     if otp == int(user_otp):
@@ -224,6 +230,7 @@ def home():
 def login():
     global useremail
     global newuser
+    # Login is the first page which the user encounters
     if request.method == 'POST':
         useremail = request.form.get('email')
         password = request.form.get('password')
@@ -235,7 +242,7 @@ def login():
         if account:
             newuser = account['NEWUSER']
             if (password == str(account['PASS']).strip()):
-                if (account['NEWUSER'] == 1):
+                if (newuser == 1):
                     return redirect('/profile')
                 return redirect('/home')
             else:
@@ -250,14 +257,13 @@ def login():
 def profile():
     global newuser
     global useremail
-    global first_name
     select_sql = "SELECT * FROM user where email= ?"
     prep_stmt = ibm_db.prepare(connection, select_sql)
     ibm_db.bind_param(prep_stmt, 1, useremail)
     ibm_db.execute(prep_stmt)
     account = ibm_db.fetch_assoc(prep_stmt)
-    pemail = account['EMAIL']
-    if (request.method == "POST"):
+    if (newuser == 1):
+
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         mobile_no = request.form.get('mobile_no')
@@ -270,11 +276,6 @@ def profile():
         state = request.form.get('states')
         experience = request.form.get('experience')
         job_title = request.form.get('job_title')
-
-        select_sql = "SELECT * FROM profile where email_id = ?"
-        prep_stmt = ibm_db.prepare(connection, select_sql)
-        ibm_db.bind_param(prep_stmt, 1, useremail)
-        ibm_db.execute(prep_stmt)
 
         insert_sql = "INSERT INTO profile VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
@@ -299,26 +300,24 @@ def profile():
         ibm_db.bind_param(prep_stmt, 1, useremail)
         ibm_db.execute(prep_stmt)
         return render_template('index.html', newuser=newuser)
-    else:
-        if (newuser == 0):
-            sql = "SELECT * FROM profile WHERE email_id =?"
-            stmt = ibm_db.prepare(connection, sql)
-            ibm_db.bind_param(stmt, 1, useremail)
-            ibm_db.execute(stmt)
-            account = ibm_db.fetch_assoc(stmt)
-            first_name = account['FIRST_NAME']
-            last_name = account['LAST_NAME']
-            mobile_no = account['MOBILE_NUMBER']
-            pemail = account['EMAIL_ID']
-            address_line_1 = account['ADDRESS_LINE_1']
-            address_line_2 = account['ADDRESS_LINE_2']
-            zipcode = account['ZIPCODE']
-            education = account['EDUCATION']
-            countries = account['COUNTRY']
-            states = account['STATEE']
-            city = account['CITY']
-            experience = account['EXPERIENCE']
-            job_title = account['JOB_TITLE']
-            return render_template('profile.html', email=pemail, newuser=newuser, first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
-        else:
-            return render_template('profile.html', email=pemail, newuser=newuser)
+
+    if (newuser == 0):
+        sql = "SELECT * FROM profile WHERE email_id =?"
+        stmt = ibm_db.prepare(connection, sql)
+        ibm_db.bind_param(stmt, 1, useremail)
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+        first_name = account['FIRST_NAME']
+        last_name = account['LAST_NAME']
+        mobile_no = account['MOBILE_NUMBER']
+        pemail = account['EMAIL_ID']
+        address_line_1 = account['ADDRESS_LINE_1']
+        address_line_2 = account['ADDRESS_LINE_2']
+        zipcode = account['ZIPCODE']
+        education = account['EDUCATION']
+        countries = account['COUNTRY']
+        states = account['STATEE']
+        city = account['CITY']
+        experience = account['EXPERIENCE']
+        job_title = account['JOB_TITLE']
+        return render_template('profile.html', email=pemail, newuser=newuser, first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
