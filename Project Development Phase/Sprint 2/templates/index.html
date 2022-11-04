@@ -32,13 +32,35 @@
 			</div>
 		</nav>
 	</div>
-	<div class="search mt-4">
-		<form class="search-form">
-			<input class="searchbar" type="text" placeholder="Search for books, authors, categories and more..">
-			<input class="submitbtn" type="submit" value="Submit">
-		</form>
+	<div class="searchbar">
+		<div class="search mt-4">
+			<form class="search-form">
+				<input class="searchbar" type="text" placeholder="Search for books, authors, categories and more..">
+				<input class="submitbtn" type="submit" value="Submit">
+			</form>
+		</div>
 	</div>
 	<div class="boxed">
+		<ol>
+			{% for i in arr %}
+			<li class="smallbox">
+				<div><b>Company Name : </b><b>{{i.cname}}</b></div>
+				<ul style="list-style: none;">
+					<li class="role"><b>Role : {{i.role}}</b></li>
+					<li><b>Experience: {{i.ex}}</b></li>
+					<li><b>Skill : {{i.skill}}</b></li>
+					<li><b>Vacancy : {{i.vacancy}}</b></li>
+					<li><b>Stream : {{i.stream}}</b></li>
+					<li><b>Job Location : {{i.job_location}}</b></li>
+					<li class="Salery">Salary : {{i.salary}}</li>
+					<li class="Apply">Apply Now</li>
+				</ul>
+				<!-- <hr width="100%" color="black" class="hr"> -->
+				{% endfor %}
+			</li>
+
+		</ol>
+	</div>
 	</div>
 </body>
 

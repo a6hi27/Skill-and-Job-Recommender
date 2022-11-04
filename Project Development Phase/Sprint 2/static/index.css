@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
+
 * {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Titillium Web', sans-serif;
 }
 
 .navbar-wrapper {
@@ -53,22 +55,56 @@ input.submitbtn {
 }
 
 form.search-form {
-  margin-left: 20px;
+  position: relative  ;
+  left: 22%;
 }
 
 .boxed {
-  position: relative;
-  top: 40px;
-  background-color: rgba(255, 255, 255, 1);
-  width: 80%;
+  position: sticky;
+  top: 20%;
+  left: -88%;
+  /* background-color: rgba(255, 255, 255, 1); */
+  border-style: solid black;
+  width: 120%;
   height: 75%;
   /* flex: 1; */
   margin: 24px auto;
   padding: 20px;
   border-radius: 25px;
+  /* overflow: auto; */
 }
 
+.hr {
+  background-color: rgb(0, 140, 255);
+}
 
+.Apply {
+  position: relative;
+  background-color: rgb(52, 141, 214);
+  color: aliceblue;
+  font-weight: 800;
+  top: 8px;
+  letter-spacing: 1.5px;
+  width: 21%;
+  height: auto;
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.role {
+  color: blue;
+}
+
+.Salery {
+  background-color: rgb(52, 141, 214);
+  color: aliceblue;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  width: 21%;
+  height: auto;
+  border-radius: 10px;
+  padding: 6px;
+}
 
 body {
   background: url('Images/Building.jpg') no-repeat center;
@@ -77,5 +113,35 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
   /* align-items: flex-start; */
+}
+
+.smallbox {
+  list-style-type: none;
+  position: relative;
+  background-color: #fff;
+  border-radius: 20px;
+  margin-top: 10px;
+  padding: 30px
+}
+
+.gridcontainer {
+  position: absolute;
+  top: 20%;
+  background-color: rgba(0, 0, 0, 0);
+  left: -0%;
+  height: 100%;
+}
+
+.searchbar{
+  position: fixed;
+  left: 5px;
+}
+
+.container{
+  position: relative;
+  margin-top: 50%;
 }

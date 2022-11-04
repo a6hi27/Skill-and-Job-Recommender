@@ -3,6 +3,7 @@ import ibm_db
 from flask_mail import Mail, Message
 from random import randint
 import os
+import csv
 import pathlib
 import requests
 import tweepy
@@ -17,6 +18,17 @@ connectionstring = "DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660
 connection = ibm_db.connect(connectionstring, '', '')
 app = Flask(__name__)
 app.debug = True
+
+arr = []
+role='Senior Software Developer'
+with open("Company_Database.csv", 'r') as file:
+    csvreader = csv.reader(file)
+    for i in csvreader:
+        if i[2] == role:
+            dict={
+                'cname':i[1],'role':i[2],'ex':i[3],'skill':i[4],'vacancy':i[5],'stream':i[6],'job_location':i[7],'salary':i[8]
+            }
+            arr.append(dict)
 
 
 mail = Mail(app)
@@ -222,7 +234,7 @@ def logout():
 
 @app.route("/home")
 def home():
-    return render_template("index.html")
+    return render_template("index.html",arr=arr)
 
 
 @app.route("/signin")
@@ -262,7 +274,7 @@ def profile():
     ibm_db.bind_param(prep_stmt, 1, useremail)
     ibm_db.execute(prep_stmt)
     account = ibm_db.fetch_assoc(prep_stmt)
-    if (newuser == 1):
+    if (newuser == 1 and request.method == 'POST'):
 
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -310,7 +322,6 @@ def profile():
         first_name = account['FIRST_NAME']
         last_name = account['LAST_NAME']
         mobile_no = account['MOBILE_NUMBER']
-        pemail = account['EMAIL_ID']
         address_line_1 = account['ADDRESS_LINE_1']
         address_line_2 = account['ADDRESS_LINE_2']
         zipcode = account['ZIPCODE']
@@ -320,4 +331,7 @@ def profile():
         city = account['CITY']
         experience = account['EXPERIENCE']
         job_title = account['JOB_TITLE']
-        return render_template('profile.html', email=pemail, newuser=newuser, first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
+        return render_template('profile.html', email=useremail, newuser=newuser, first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
+
+    else:
+        return render_template('profile.html', newuser=newuser, email=useremail)

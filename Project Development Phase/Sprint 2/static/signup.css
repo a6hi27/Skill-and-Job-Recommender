@@ -1,7 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
+
 
 * {
-    font-family: 'Playfair Display', serif;
+    color: #000000;
+    font-family: 'Titillium Web', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1.2;
+}
+
+label.checkbox-inline {
+    color: #ffffff;
+}
+
+#text {
+    color: #ffffff;
 }
 
 .container {
@@ -9,7 +21,6 @@
     width: 100%;
     object-fit: cover;
     background-size: cover;
-    font-family: 'Roboto', sans-serif;
 }
 
 .form-control {
@@ -20,6 +31,10 @@
 
 .form-control:focus {
     border-color: #5cb85c;
+}
+
+.box small {
+    color: red;
 }
 
 .form-control,
@@ -72,13 +87,14 @@
 }
 
 .signup-form form {
-    margin-bottom: 15px;
+    margin-bottom: 7px;
     padding: 30px;
 }
 
 .signup-form .form-group {
     color: #fff;
     margin-bottom: 20px;
+    font-size: medium;
 }
 
 .signup-form input[type="checkbox"] {
@@ -119,5 +135,7 @@
 }
 
 .signup-form .text-center {
+    position: relative;
     color: #fff;
+    top: 0;
 }
