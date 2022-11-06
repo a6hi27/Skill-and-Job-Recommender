@@ -13,7 +13,7 @@
     <body>
         <div class="container">
             <div class="signup-form">
-                <form action="/verification" method="post">
+                <form action="/verification" onsubmit="return validatepassword()" method="post">
                     <h2>Register</h2>
                     <p class="hint-text">Create your account. It's free and only takes a minute.</p>
                     <div class="form-group">
@@ -31,7 +31,6 @@
                         <div class="box">
                             <input type="password" class="form-control" name="password" id="password"
                                 placeholder="Password" onkeyup="validatepassword()" required="required">
-
                             <small id="password-error"></small>
                         </div>
 
@@ -54,8 +53,8 @@
                         <p>{{msg}}</p>
                     </div>
                 </form>
-                <div class="text-center">Already have an account? <a href="signin">Sign in</a></div>
+                <div class="text-center">Already have an account? <a href="login">Sign in</a></div>
             </div>
-
+        </div>
     </body>
 </hmtl>

@@ -89,9 +89,9 @@
 									disabled {%endif%}>
 							</div>
 							<div class="col-md-12"><label class="labels">Email
-									ID</label><input type="text" class="form-control" placeholder="Enter your email"
-									name="email" value="{% if newuser==0 or newuser==1 %}{{email}}{%endif%}" {%if
-									newuser==0 or newuser==1%} disabled {%endif%} required>
+									ID</label><input type="text" class="form-control" name="email"
+									value="{% if newuser==0 or newuser==1 %}{{email}}{%endif%}" {%if newuser==0 or
+									newuser==1%} disabled {%endif%} required>
 							</div>
 							<div class="col-md-12"><label class="labels">Education</label>{%if
 								newuser==1%}<select id="education" name="education" required>
