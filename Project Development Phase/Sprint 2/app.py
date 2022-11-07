@@ -1,25 +1,24 @@
 from flask import Flask, render_template, request
 import ibm_db
-from flask_mail import Mail, Message
-from random import randint
 import json
 import os
 import csv
 import pathlib
 import requests
 import tweepy
-from flask import Flask, session, abort, redirect, request
+import google.auth.transport.requests
+from flask_mail import Mail, Message
+from random import randint
+from flask import Flask, session, abort, redirect
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
-import google.auth.transport.requests
 
 connectionstring = "DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31864;PROTOCOL=TCPIP;UID=mzh43207;PWD=pLYMGfSprZntFyaz;SECURITY=SSL;"
 
 connection = ibm_db.connect(connectionstring, '', '')
 app = Flask(__name__)
 app.debug = True
-
 
 
 mail = Mail(app)
@@ -220,6 +219,7 @@ def logout():
     session.pop('useremail', None)
     session.pop('regmail', None)
     session.pop('newuser', None)
+    session.pop('role',None)
     return redirect("/login")
 
 
@@ -231,7 +231,7 @@ def home():
         with open("Company_Database.csv", 'r') as file:
             csvreader = csv.reader(file)
             for i in csvreader:
-                if i[2] == role:
+                if i[2].casefold() == role.casefold():
                     dict = {
                         'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8]
                     }
@@ -263,10 +263,10 @@ def login():
                     stmt = ibm_db.prepare(connection, sql)
                     ibm_db.bind_param(stmt, 1, useremail)
                     print(useremail)
+                    print(session['role'])
                     ibm_db.execute(stmt)
                     account = ibm_db.fetch_assoc(stmt)
-                    session['role']=account['JOB_TITLE']
-                    print(session['role'])
+                    session['role'] = account['JOB_TITLE']
                     return redirect('/home')
             else:
                 return render_template('signin.html', msg="Password is invalid")
