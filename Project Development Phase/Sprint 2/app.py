@@ -227,15 +227,18 @@ def logout():
 def home():
     if "useremail" in session:
         arr = []
-        role = session['role']
+        # role = session['role']
+        role = 'Software Developer'
         with open("Company_Database.csv", 'r') as file:
             csvreader = csv.reader(file)
             for i in csvreader:
                 if i[2].casefold() == role.casefold():
                     dict = {
-                        'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8]
+                        'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link':i[9], 'logo':i[10]
                     }
                     arr.append(dict)
+        for i in arr:
+            print(i)
         companies = json.dumps(arr)
         return render_template("index.html", companies=companies, arr=arr)
     else:

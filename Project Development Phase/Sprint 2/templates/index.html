@@ -12,8 +12,15 @@
 		href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap">
 	<!-- <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">-->
 	<link rel="stylesheet" href="../static/index.css">
-	<script>
-
+	<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+	<script>		$(document).ready(function () {
+			$('.content').click(function () {
+				$('.content').toggleClass("heart-active")
+				$('.text').toggleClass("heart-active")
+				$('.numb').toggleClass("heart-active")
+				$('.heart').toggleClass("heart-active")
+			});
+		});
 		function decodeHtml(html) {
 			var txt = document.createElement("textarea");
 			txt.innerHTML = html;
@@ -30,7 +37,6 @@
 			var vacancy = document.getElementById('vacancy')
 			var link = document.getElementById('link')
 			var logo = document.getElementById('logo')
-
 			var json = JSON.parse(decodeHtml('{{companies}}'));
 			var id = obj.getAttribute('id');
 			var clickedcompany = json.find(function (obj) {
@@ -88,11 +94,20 @@
 				<div style="color: rgb(66, 66, 130);" id="cname"><b>Company Name</b></div>
 				<div style="color: rgb(82, 82, 108); " id="role"><b>Role</b></div>
 				<div id="salary">Salary</div>
-				<div class="applybox"><b>Apply Job</b></div>
+				<div class="applybox"><b>Apply Job</b>
+
+					<div class="heart-btn">
+						<div class="content">
+							<span class="heart"></span>
+							<span class="text">Like</span>
+							<span class="numb"></span>
+						</div>
+					</div>
+
+				</div>
 				<div class="Aboutcompany"><b>About Company</b>
 					<a id="link" href="" target="_blank"></a>
 				</div>
-				</a>
 			</div>
 			<div class="outboxinbox2">
 				<div>
@@ -102,7 +117,8 @@
 						Outline audience personas according to brand, business and user requirements.
 						Visualize the user journey from start to finish and articulate it through experience design.
 						Prioritize content, functions and features according to strategic research.
-						Create and develop clean, end-to-end user experiences that meet project goals and objectives.
+						Create and develop clean, end-to-end user experiences that meet project goals and
+						objectives.
 						Deliver user flows.</p>
 				</div>
 				<div>
@@ -138,9 +154,11 @@
 			<div class="boxedcontent">
 				<spam>
 					<img class="companylogo"
-						src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9AadNHQhLzWdn6cJXt9abVHd0BoUUCpzc2pd_FlHJQP-maRVmMzXkWaIrJa71feyi9rE&usqp=CAU">
+						src='{{i.logo}}'>
 				</spam>
-				<li><b>Company Name : <button id='{{i.cname}}' style="border: none; background-color: transparent;color: blue;" onclick="companydetails(this)">{{i.cname}}</button></b>
+				<li><b>Company Name : <button id='{{i.cname}}'
+							style="border: none; background-color: transparent;color: blue;"
+							onclick="companydetails(this)">{{i.cname}}</button></b>
 				</li>
 				<ul style="list-style:none;">
 					<li>Role : {{i.role}}</li>
