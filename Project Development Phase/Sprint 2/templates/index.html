@@ -37,13 +37,12 @@
 			var vacancy = document.getElementById('vacancy')
 			var link = document.getElementById('link')
 			var logo = document.getElementById('logo')
+
 			var json = JSON.parse(decodeHtml('{{companies}}'));
 			var id = obj.getAttribute('id');
 			var clickedcompany = json.find(function (obj) {
 				return obj.cname === id;
 			});
-
-			console.log(clickedcompany)
 
 			cname.innerHTML = clickedcompany.cname
 			role.innerHTML = clickedcompany.role
@@ -53,7 +52,7 @@
 			job_location.innerHTML = clickedcompany.job_location
 			vacancy.innerHTML = clickedcompany.vacancy
 			link.href = clickedcompany.link
-
+			logo.src = clickedcompany.logo
 		}
 	</script>
 </head>
@@ -88,14 +87,14 @@
 		<div class='outbox'>
 			<div class="outboxinbox">
 				<spam>
-					<img class="companylogooutbox"
-						src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9AadNHQhLzWdn6cJXt9abVHd0BoUUCpzc2pd_FlHJQP-maRVmMzXkWaIrJa71feyi9rE&usqp=CAU">
+					<img class="companylogooutbox" id="logo">
 				</spam>
 				<div style="color: rgb(66, 66, 130);" id="cname"><b>Company Name</b></div>
 				<div style="color: rgb(82, 82, 108); " id="role"><b>Role</b></div>
 				<div id="salary">Salary</div>
-				<div class="applybox"><b>Apply Job</b>
-
+				<div class="applybox">
+					<input type="file">
+					<button>Apply Job</button>
 					<div class="heart-btn">
 						<div class="content">
 							<span class="heart"></span>
@@ -103,11 +102,10 @@
 							<span class="numb"></span>
 						</div>
 					</div>
-
 				</div>
-				<div class="Aboutcompany"><b>About Company</b>
-					<a id="link" href="" target="_blank"></a>
-				</div>
+				<a id="link" target="_blank">
+					<div class="Aboutcompany"><b>About Company</b></div>
+				</a>
 			</div>
 			<div class="outboxinbox2">
 				<div>
@@ -153,8 +151,7 @@
 		<div class="boxed">
 			<div class="boxedcontent">
 				<spam>
-					<img class="companylogo"
-						src='{{i.logo}}'>
+					<img class="companylogo" src='{{i.logo}}'>
 				</spam>
 				<li><b>Company Name : <button id='{{i.cname}}'
 							style="border: none; background-color: transparent;color: blue;"

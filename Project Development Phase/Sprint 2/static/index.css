@@ -197,8 +197,9 @@ body {
 .companylogooutbox {
   position: relative;
   left: -5px;
-  width: 60px;
+  width: 30%;
   height: 62px;
+  margin-bottom: 2%;
 }
 
 .fixed-top {
@@ -210,7 +211,7 @@ body {
   height: 9%;
 }
 
-@import url('https://fonts.googleapis.com/css?family=Montserrat:600&display=swap');
+
 
 .heart-btn {
   position: absolute;
@@ -248,7 +249,6 @@ body {
   font-size: 21px;
   margin-left: 30px;
   color: grey;
-  font-family: 'Montserrat', sans-serif;
 }
 
 .numb:before {
