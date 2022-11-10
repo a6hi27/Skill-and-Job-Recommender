@@ -19,13 +19,11 @@
 				$('.text').toggleClass("heart-active")
 				$('.heart').toggleClass("heart-active")
 				var jobid = document.getElementById('jobid');
+				console.log(jobid)
 				$.ajax({
 					url: '/like',
 					type: 'POST',
-					data: { 'jobid': jobid },
-					success: function (data) {
-						location.reload(true)
-					}
+					data: { 'jobid': jobid.value }
 				});
 			});
 		});
@@ -36,6 +34,7 @@
 		}
 
 		function companydetails(obj) {
+			var jobid = document.getElementById('jobid')
 			var cname = document.getElementById('cname')
 			var role = document.getElementById('role')
 			var salary = document.getElementById('salary')
@@ -51,7 +50,7 @@
 			var clickedcompany = json.find(function (obj) {
 				return obj.cname === id;
 			});
-
+			jobid.innerHTML = clickedcompany.jobid
 			cname.innerHTML = clickedcompany.cname
 			role.innerHTML = clickedcompany.role
 			salary.innerHTML = clickedcompany.salary
@@ -61,6 +60,9 @@
 			vacancy.innerHTML = clickedcompany.vacancy
 			link.href = clickedcompany.link
 			logo.src = clickedcompany.logo
+		}
+		function redirectToApply() {
+			window.location.href = "/apply"
 		}
 	</script>
 </head>
@@ -97,12 +99,14 @@
 				<spam>
 					<img class="companylogooutbox" id="logo">
 				</spam>
+				<div id="jobid" style="display: none;"></div>
 				<div style="color: rgb(66, 66, 130);" id="cname"><b>Company Name</b></div>
 				<div style="color: rgb(82, 82, 108); " id="role"><b>Role</b></div>
 				<div id="salary">Salary</div>
 				<div class="applybox">
-					<input type="file">
-					<button>Apply Job</button>
+
+					<button class="applyjob" type="submit" onclick="redirectToApply()">Apply Job</button>
+
 					<div class="heart-btn">
 						<div class="content">
 							<span class="heart"></span>

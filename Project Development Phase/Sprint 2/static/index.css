@@ -131,6 +131,16 @@ body {
   position: relative;
   top: 5px;
   width: 115px;
+  height: 35px;
+  padding: 1.5px 10px;
+  color: transparent;
+  margin-bottom: 5px;
+}
+
+button.applyjob {
+  position: relative;
+  top: 5px;
+  width: 115px;
   letter-spacing: 1px;
   height: 35px;
   padding: 1.5px 10px;
@@ -138,6 +148,8 @@ body {
   background-color: rgb(66, 66, 130);
   color: aliceblue;
   margin-bottom: 5px;
+  border-color: transparent;
+  font-weight: bolder;
 }
 
 .Aboutcompany {

@@ -241,14 +241,16 @@ def home():
         return redirect('/login')
 
 
-@app.route('/like')
-def store_like(request):
-    session['jobid'] = request.POST.get('jobid')
+@app.route('/like', methods=['POST', 'GET'])
+def store_like():
+    session['jobid'] = request.form.get('jobid')
+    print(session['jobid'])
     insert_sql = "INSERT INTO LIKES(USERID,JOBID) VALUES(?,?)"
     prep_stmt = ibm_db.prepare(connection, insert_sql)
     ibm_db.bind_param(prep_stmt, 1, session['userid'])
-    ibm_db.bind_param(prep_stmt, 1, session['jobid'])
+    ibm_db.bind_param(prep_stmt, 2, session['jobid'])
     ibm_db.execute(prep_stmt)
+    return None
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -404,3 +406,37 @@ def forgotpass():
                 return render_template('forgotpass.html', msg="It looks like you are not yet our member!")
     i = 0
     return render_template('forgotpass.html')
+
+
+@app.route("/apply", methods=["POST", "GET"])
+def apply():
+    if "useremail" in session:
+        sql = "SELECT * FROM profile WHERE email_id =?"
+        stmt = ibm_db.prepare(connection, sql)
+        ibm_db.bind_param(stmt, 1, session['useremail'])
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+        first_name = account['FIRST_NAME']
+        last_name = account['LAST_NAME']
+        mobile_no = account['MOBILE_NUMBER']
+        zipcode = account['ZIPCODE']
+        education = account['EDUCATION']
+        countries = account['COUNTRY']
+        states = account['STATEE']
+        city = account['CITY']
+        experience = account['EXPERIENCE']
+        job_title = account['JOB_TITLE']
+        return render_template('apply.html', email=session['useremail'], newuser=session['newuser'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
+    else:
+        return redirect('/login')
+
+
+@app.route("/applysuccess", methods=["POST", 'GET'])
+def applysuccess():
+    if "useremail" in session:
+        if request.method == "POST":
+            return render_template('applysuccess.html')
+        else:
+            return redirect("/home")
+    else:
+        return redirect('/home')
