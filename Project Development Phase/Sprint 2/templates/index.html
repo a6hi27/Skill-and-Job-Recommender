@@ -17,8 +17,16 @@
 			$('.content').click(function () {
 				$('.content').toggleClass("heart-active")
 				$('.text').toggleClass("heart-active")
-				$('.numb').toggleClass("heart-active")
 				$('.heart').toggleClass("heart-active")
+				var jobid = document.getElementById('jobid');
+				$.ajax({
+					url: '/like',
+					type: 'POST',
+					data: { 'jobid': jobid },
+					success: function (data) {
+						location.reload(true)
+					}
+				});
 			});
 		});
 		function decodeHtml(html) {
@@ -99,7 +107,6 @@
 						<div class="content">
 							<span class="heart"></span>
 							<span class="text">Like</span>
-							<span class="numb"></span>
 						</div>
 					</div>
 				</div>

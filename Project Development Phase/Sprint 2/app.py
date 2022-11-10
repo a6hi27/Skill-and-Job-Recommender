@@ -219,7 +219,7 @@ def logout():
     session.pop('useremail', None)
     session.pop('regmail', None)
     session.pop('newuser', None)
-    session.pop('role',None)
+    session.pop('role', None)
     return redirect("/login")
 
 
@@ -227,22 +227,28 @@ def logout():
 def home():
     if "useremail" in session:
         arr = []
-        # role = session['role']
-        role = 'Software Developer'
         with open("Company_Database.csv", 'r') as file:
             csvreader = csv.reader(file)
             for i in csvreader:
-                if i[2].casefold() == role.casefold():
+                if i[2].casefold() == session['role'].casefold():
                     dict = {
-                        'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link':i[9], 'logo':i[10]
+                        'jobid': i[0], 'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link': i[9], 'logo': i[10]
                     }
                     arr.append(dict)
-        for i in arr:
-            print(i)
         companies = json.dumps(arr)
         return render_template("index.html", companies=companies, arr=arr)
     else:
         return redirect('/login')
+
+
+@app.route('/like')
+def store_like(request):
+    session['jobid'] = request.POST.get('jobid')
+    insert_sql = "INSERT INTO LIKES(USERID,JOBID) VALUES(?,?)"
+    prep_stmt = ibm_db.prepare(connection, insert_sql)
+    ibm_db.bind_param(prep_stmt, 1, session['userid'])
+    ibm_db.bind_param(prep_stmt, 1, session['jobid'])
+    ibm_db.execute(prep_stmt)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -258,6 +264,7 @@ def login():
         if account:
             session["useremail"] = useremail
             session["newuser"] = account['NEWUSER']
+            session['userid'] = account['USERID']
             if (password == str(account['PASS']).strip()):
                 if (session['newuser'] == 1):
                     return redirect('/profile')
@@ -265,8 +272,6 @@ def login():
                     sql = "SELECT * FROM profile WHERE email_id =?"
                     stmt = ibm_db.prepare(connection, sql)
                     ibm_db.bind_param(stmt, 1, useremail)
-                    print(useremail)
-                    print(session['role'])
                     ibm_db.execute(stmt)
                     account = ibm_db.fetch_assoc(stmt)
                     session['role'] = account['JOB_TITLE']
