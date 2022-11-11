@@ -32,19 +32,19 @@
     <form action="/applysuccess" method="post">
         <div class="container rounded bg-white mt-5 mb-5">
             <div class="row">
-                <div class="col-md-5 border-right">
+                <div class="col">
                     <div class="p-3 py-5">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="text-right"><b>Apply Job</b></h4>
+                            <h4 class="text-center"><b>Apply Job</b></h4>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-6"><label class="labels">First Name</label><input type="text"
                                     class="form-control" placeholder="First name" name="first_name"
-                                    value="{{first_name}}" disabled>
+                                    value="{{first_name}}" readonly>
                             </div>
                             <div class="col-md-6"><label class="labels">Lastname</label><input type="text"
                                     class="form-control" name="last_name" placeholder="Lastname" value="{{last_name}}"
-                                    disabled>
+                                    readonly>
                             </div>
                         </div>
                         <div class="row mt-3">
@@ -54,81 +54,40 @@
                             </div>
                             <div class="col-md-12"><label class="labels">Zipcode</label><input type="text"
                                     class="form-control" placeholder="Zipcode" name="zipcode" value="{{zipcode}}"
-                                    required>
+                                    disabled>
                             </div>
                             <div class="col-md-12"><label class="labels">City</label><input type="text"
-                                    class="form-control" placeholder="Enter City" value="{{city}}" name="city" required>
+                                    class="form-control" placeholder="Enter City" value="{{city}}" name="city" readonly>
                             </div>
                             <div class="col-md-12"><label class="labels">Email
                                     ID</label><input type="text" class="form-control" name="email" value="{{email}}"
-                                    disabled required>
+                                    readonly>
                             </div>
                             <div class="col-md-12"><label class="labels">Education</label>
-                                <input type="text" class="form-control" name="education" value="{{education}}" disabled>
+                                <input type="text" class="form-control" name="education" value="{{education}}" readonly>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-6"><label class="labels">Country</label>
-                                <!--{%if newuser==1%}<select
-                                id="countries" name="countries" required>
-                                <option value="" required>--Select Country--
-                                </option>
-                            </select>{%else%}--><input type="text" class="form-control" name="countries"
-                                    value="{{countries}}" required disabled>
-                                <!--{%endif%}-->
+                                <input type="text" class="form-control" name="countries" value="{{countries}}" readonly>
+
                             </div>
                             <div class="col-md-6"><label class="labels">State</label>
-                                <!--{%if newuser==1%}<select id="states"
-                                name="states" required>
-                                <option value="">--Select State--</option>
-                            </select>{%else%}--><input type="text" class="form-control" name="states"
-                                    value="{{states}}" required disabled>
-                                <!--{%endif%}-->
+                                <input type="text" class="form-control" name="states" value="{{states}}" readonly>
+
                             </div>
                         </div>
-                        <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="submit"
-                                onclick="">Apply
-                                Job</button></div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3 py-5">
-                        <div class="d-flex justify-content-between align-items-center experience">
-                        </div><br>
-                        <div class="col-md-12"><label class="labels">Experience</label>{% if newuser==1 %}<select
-                                id="education" name="experience" required>
-                                <option value="">--Years of Experience--</option>
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">2+</option>
-                            </select>{% else %}<input type="text" class="form-control" name="experience"
-                                value="{{experience}}" required disabled>{% endif %}</div> <br>
-                        <div class="col-md-12"><label class="labels">Job Title</label>{%if newuser==1%}<select
-                                id="job_title" name="job_title" required>
-                                <option value="">--Select a job title--</option>
-                                <option value="Software Developer">Software Developer
-                                </option>
-                                <option value="Web Developer">Web Developer</option>
-                                <option value="Full Stack Developer">Full Stack
-                                    Developer
-                                </option>
-                                <option value="UI/UX Designer">UI/UX Designer</option>
-                                <option value=".NET Developer">.NET Developer</option>
-                                <option value="Firmware Engineer">Firmware Engineer
-                                </option>
-                                <option value="Senior Software Developer">Senior
-                                    Software
-                                    Developer </option>
-                                <option value="Embedded System Engineer">Embedded System
-                                    Engineer</option>
-                            </select>{%else%}<input type="text" class="form-control" name="job_title"
-                                value="{{job_title}}" required disabled>{%endif%}
-
-
+                        <div class="row mt-3">
+                            <div class="col-md-12"><label class="labels">Years Of Experience</label><input type="text"
+                                    class="form-control" name="experience" value="{{experience}}" readonly>
+                            </div>
+                            <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="submit"
+                                    onclick="">Apply
+                                    Job</button></div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </form>

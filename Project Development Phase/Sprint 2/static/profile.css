@@ -8,6 +8,11 @@
     letter-spacing: 1.2;
 }
 
+.navbar {
+    padding: 0.5rem 1rem;
+    height: 9%;
+}
+
 .form-control:focus {
     box-shadow: none;
     border-color: #BA68C8
@@ -69,6 +74,16 @@ label.labels {
 
 select {
     width: 100%;
+}
+
+.form-control:disabled {
+    background-color: #abd5ff;
+}
+
+.form-control {
+    opacity: 1;
+    color: black;
+    font-weight: bold;
 }
 
 body {

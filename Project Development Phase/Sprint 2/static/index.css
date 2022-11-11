@@ -36,15 +36,7 @@ body {
   background-size: 100% 100%;
 }
 
-.Searchbar {
-  width: 15%;
-  height: 5%;
-}
 
-.Searchbar {
-  margin-top: 7%;
-  left: 15%;
-}
 
 .topbar {
   position: static;
@@ -294,4 +286,55 @@ button.applyjob {
   100% {
     background-position: right;
   }
+}
+
+.boxed_2 {
+  position: relative;
+  margin-top: 25%;
+  font-size: xx-large;
+}
+
+.list {
+  width: 33%;
+  background-color: white;
+  border-radius: 20px;
+  position: absolute;
+  top: 100%;
+  left: 28%;
+}
+
+.list-items {
+  padding: 10px 5px;
+}
+
+.list-items:hover {
+  background-color: #dddddd;
+}
+
+.Searchbar {
+  width: 15%;
+  height: 5%;
+}
+
+.Searchbar {
+  margin-top: 7%;
+  left: 15%;
+}
+
+
+input[type="text"] {
+
+  border-style: solid;
+  border-color: rgb(66, 66, 130);
+  box-shadow: 0 0 8px 1px #48abe0;
+  position: absolute;
+  top: 15%;
+  left: 28%;
+  width: 33%;
+  border-radius: 20px;
+  padding: 8px;
+  border-bottom: 1px solid #645979;
+  outline: none;
+  border-radius: 20px;
+  background-color: #ffffff;
 }

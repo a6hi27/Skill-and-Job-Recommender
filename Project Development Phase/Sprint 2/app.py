@@ -5,7 +5,6 @@ import os
 import csv
 import pathlib
 import requests
-import tweepy
 import google.auth.transport.requests
 from flask_mail import Mail, Message
 from random import randint
@@ -39,9 +38,6 @@ mail = Mail(app)
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-consumer_key = ''
-consumer_secret = ''
-tcallback = 'http://127.0.0.1:5000/tcallback'
 
 GOOGLE_CLIENT_ID = ""
 client_secrets_file = os.path.join(
@@ -152,7 +148,7 @@ def callback():
         audience=GOOGLE_CLIENT_ID
     )
 
-    session["email_id"] = id_info.get("email")
+    session["useremail"] = id_info.get("email")
     session["first_name"] = id_info.get("given_name")
     session["last_name"] = id_info.get("family_name")
 
@@ -163,18 +159,25 @@ def callback():
 
     first_name = session['first_name']
     last_name = session['last_name']
-    useremail = session['email_id']
+    useremail = session['useremail']
     password = ""
 
-    sql = "SELECT * FROM User WHERE email =?"
-    stmt = ibm_db.prepare(connection, sql)
-    ibm_db.bind_param(stmt, 1, useremail)
-    ibm_db.execute(stmt)
-    account = ibm_db.fetch_assoc(stmt)
-
-    if account:
-        if (account['NEWUSER'] == 1):
+    usersql = "SELECT * FROM User WHERE email =?"
+    userstmt = ibm_db.prepare(connection, usersql)
+    ibm_db.bind_param(userstmt, 1, useremail)
+    ibm_db.execute(userstmt)
+    useraccount = ibm_db.fetch_assoc(userstmt)
+    if useraccount:
+        session['newuser'] = useraccount['NEWUSER']
+        if (session['newuser'] == 1):
+            print(session['newuser'])
             return redirect('/profile')
+        prosql = "SELECT * FROM profile WHERE email_id =?"
+        prostmt = ibm_db.prepare(connection, prosql)
+        ibm_db.bind_param(prostmt, 1, useremail)
+        ibm_db.execute(prostmt)
+        proaccount = ibm_db.fetch_assoc(prostmt)
+        session['role'] = proaccount['JOB_TITLE']
         return redirect('/home')
 
     else:
@@ -189,54 +192,44 @@ def callback():
         return redirect("/profile")
 
 
-@app.route('/tlogin')
-def auth():
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret, tcallback)
-    url = auth.get_authorization_url()
-    session['request_token'] = auth.request_token
-    return redirect(url)
-
-
-@app.route('/tcallback')
-def twitter_callback():
-
-    global first_name
-    request_token = session['request_token']
-    print(request_token)
-    del session['request_token']
-
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret, tcallback)
-    auth.request_token = request_token
-    verifier = request.args.get('oauth_verifier')
-    auth.get_access_token(verifier)
-    session['token'] = (auth.access_token, auth.access_token_secret)
-    first_name = session['token']
-    return redirect('/profile')
-
-
 @app.route("/logout")
 def logout():
     session.pop('useremail', None)
     session.pop('regmail', None)
     session.pop('newuser', None)
     session.pop('role', None)
+    session.pop('userid', None)
     return redirect("/login")
 
 
-@app.route("/home")
+@app.route("/home", methods=['POST', 'GET'])
 def home():
     if "useremail" in session:
-        arr = []
-        with open("Company_Database.csv", 'r') as file:
-            csvreader = csv.reader(file)
-            for i in csvreader:
-                if i[2].casefold() == session['role'].casefold():
-                    dict = {
-                        'jobid': i[0], 'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link': i[9], 'logo': i[10]
-                    }
-                    arr.append(dict)
-        companies = json.dumps(arr)
-        return render_template("index.html", companies=companies, arr=arr)
+        if request.method == 'POST':
+            user_search = request.form.get('search')
+            arr = []
+            with open("Company_Database.csv", 'r') as file:
+                csvreader = csv.reader(file)
+                for i in csvreader:
+                    if i[2].casefold() == user_search.casefold():
+                        dict = {
+                            'jobid': i[0], 'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link': i[9], 'logo': i[10]
+                        }
+                        arr.append(dict)
+            companies = json.dumps(arr)
+            return render_template("index.html", companies=companies, arr=arr)
+        else:
+            arr = []
+            with open("Company_Database.csv", 'r') as file:
+                csvreader = csv.reader(file)
+                for i in csvreader:
+                    if i[2].casefold() == session['role'].casefold():
+                        dict = {
+                            'jobid': i[0], 'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link': i[9], 'logo': i[10]
+                        }
+                        arr.append(dict)
+            companies = json.dumps(arr)
+            return render_template("index.html", companies=companies, arr=arr)
     else:
         return redirect('/login')
 
@@ -329,9 +322,10 @@ def profile():
             prep_stmt = ibm_db.prepare(connection, insert_sql)
             ibm_db.bind_param(prep_stmt, 1, session['useremail'])
             ibm_db.execute(prep_stmt)
+            session['role'] = job_title
             return redirect('/home')
 
-        if (session['newuser'] == 0):
+        elif (session['newuser'] == 0 and request.method == "GET"):
             sql = "SELECT * FROM profile WHERE email_id =?"
             stmt = ibm_db.prepare(connection, sql)
             ibm_db.bind_param(stmt, 1, session['useremail'])
@@ -351,6 +345,31 @@ def profile():
             job_title = account['JOB_TITLE']
             return render_template('profile.html', email=session['useremail'], newuser=session['newuser'], first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
 
+        elif (session['newuser'] == 0 and request.method == "POST"):
+            mobile_no = request.form.get('mobile_no')
+            address_line_1 = request.form.get('address_line_1')
+            address_line_2 = request.form.get('address_line_2')
+            zipcode = request.form.get('zipcode')
+            city = request.form.get('city')
+            country = request.form.get('countries')
+            state = request.form.get('states')
+            experience = request.form.get('experience')
+            job_title = request.form.get('job_title')
+            sql = "UPDATE profile SET(mobile_number,address_line_1,address_line_2,zipcode,city,country,statee,experience,job_title)=(?,?,?,?,?,?,?,?,?) where email_id =?"
+            stmt = ibm_db.prepare(connection, sql)
+            ibm_db.bind_param(stmt, 1, mobile_no)
+            ibm_db.bind_param(stmt, 2, address_line_1)
+            ibm_db.bind_param(stmt, 3, address_line_2)
+            ibm_db.bind_param(stmt, 4, zipcode)
+            ibm_db.bind_param(stmt, 5, city)
+            ibm_db.bind_param(stmt, 6, country)
+            ibm_db.bind_param(stmt, 7, state)
+            ibm_db.bind_param(stmt, 8, experience)
+            ibm_db.bind_param(stmt, 9, job_title)
+            ibm_db.bind_param(stmt, 10, session['useremail'])
+            ibm_db.execute(stmt)
+            session['role'] = job_title
+            return redirect("/home")
         else:
             return render_template('profile.html', newuser=session['newuser'], email=session['useremail'])
     else:
@@ -435,6 +454,28 @@ def apply():
 def applysuccess():
     if "useremail" in session:
         if request.method == "POST":
+            first_name = request.form.get('first_name')
+            last_name = request.form.get('last_name')
+            mobile_no = request.form.get('mobile_no')
+            zipcode = request.form.get('zipcode')
+            city = request.form.get('city')
+            education = request.form.get('education')
+            country = request.form.get('countries')
+            state = request.form.get('states')
+            experience = request.form.get('experience')
+            insert_sql = "INSERT INTO appliedcompany(first_name,last_name,mobile_number,zipcode,city,email,education,country,state,experience) VALUES (?,?,?,?,?,?,?,?,?,?)"
+            prep_stmt = ibm_db.prepare(connection, insert_sql)
+            ibm_db.bind_param(prep_stmt, 1, first_name)
+            ibm_db.bind_param(prep_stmt, 2, last_name)
+            ibm_db.bind_param(prep_stmt, 3, mobile_no)
+            ibm_db.bind_param(prep_stmt, 4, zipcode)
+            ibm_db.bind_param(prep_stmt, 5, city)
+            ibm_db.bind_param(prep_stmt, 6, session['useremail'])
+            ibm_db.bind_param(prep_stmt, 7, education)
+            ibm_db.bind_param(prep_stmt, 8, country)
+            ibm_db.bind_param(prep_stmt, 9, state)
+            ibm_db.bind_param(prep_stmt, 10, experience)
+            ibm_db.execute(prep_stmt)
             return render_template('applysuccess.html')
         else:
             return redirect("/home")

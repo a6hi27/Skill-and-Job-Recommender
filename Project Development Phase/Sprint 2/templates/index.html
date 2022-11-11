@@ -87,12 +87,16 @@
 	</div>
 	<div class="topbar">
 		<div class="Searchbar">
-			<form class="searchform">
-				<input class="searchbox" type="text" placeholder="Job Role, Company Name or keyword">
+			<form class="searchform" action="/home" method="post" autocomplete="off">
+				<input class="searchbox" type="text" placeholder="Job Role, Company Name or keyword" name="search"
+					id="input">
 				<input class="submitbtn" type="submit">
+				<script src="../static/js/suggestions.js"></script>
+				<ul class="list"></ul>
 			</form>
 		</div>
 	</div>
+	{%if arr!=[]%}
 	<div class="container">
 		<div class='outbox'>
 			<div class="outboxinbox">
@@ -183,6 +187,11 @@
 		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 		<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 	</div>
+	{% else %}
+	<div class="boxed_2">
+		<p>Oops! Currently there are no such job openings</p>
+	</div>
+	{%endif%}
 </body>
 
 </html>
