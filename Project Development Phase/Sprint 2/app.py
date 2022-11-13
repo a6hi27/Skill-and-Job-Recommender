@@ -1,14 +1,14 @@
-from flask import Flask, render_template, request
-import ibm_db
+import csv
 import json
 import os
-import csv
 import pathlib
-import requests
-import google.auth.transport.requests
-from flask_mail import Mail, Message
 from random import randint
-from flask import Flask, session, abort, redirect
+
+import google.auth.transport.requests
+import ibm_db
+import requests
+from flask import Flask, abort, redirect, render_template, request, session
+from flask_mail import Mail, Message
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
@@ -217,8 +217,14 @@ def home():
                         }
                         arr.append(dict)
             companies = json.dumps(arr)
+
             return render_template("index.html", companies=companies, arr=arr)
         else:
+            sql = "SELECT * FROM appliedcompany WHERE userid =?"
+            stmt = ibm_db.prepare(connection, sql)
+            ibm_db.bind_param(stmt, 1, session['userid'])
+            ibm_db.execute(stmt)
+            account = ibm_db.fetch_assoc(stmt)
             arr = []
             with open("Company_Database.csv", 'r') as file:
                 csvreader = csv.reader(file)
@@ -427,25 +433,43 @@ def forgotpass():
     return render_template('forgotpass.html')
 
 
-@app.route("/apply", methods=["POST", "GET"])
-def apply():
+@app.route("/apply/<string:jobid>", methods=["POST", "GET"])
+def apply(jobid):
     if "useremail" in session:
-        sql = "SELECT * FROM profile WHERE email_id =?"
-        stmt = ibm_db.prepare(connection, sql)
-        ibm_db.bind_param(stmt, 1, session['useremail'])
-        ibm_db.execute(stmt)
-        account = ibm_db.fetch_assoc(stmt)
-        first_name = account['FIRST_NAME']
-        last_name = account['LAST_NAME']
-        mobile_no = account['MOBILE_NUMBER']
-        zipcode = account['ZIPCODE']
-        education = account['EDUCATION']
-        countries = account['COUNTRY']
-        states = account['STATEE']
-        city = account['CITY']
-        experience = account['EXPERIENCE']
-        job_title = account['JOB_TITLE']
-        return render_template('apply.html', email=session['useremail'], newuser=session['newuser'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
+        if request.method == "POST":
+            session['appliedjobid'] = int(json.loads(jobid))
+            stmt = ibm_db.prepare(
+                connection, "select * from appliedcompany where userid=?")
+            ibm_db.bind_param(stmt, 1, session['userid'])
+            ibm_db.execute(stmt)
+            account = ibm_db.fetch_assoc(stmt)
+            while (account != False):
+                print(session['appliedjobid'])
+                if (session['appliedjobid'] == account["JOBID"]):
+                    return render_template('index.html', msg="You have already applied for this job!")
+                account = ibm_db.fetch_assoc(stmt)
+            print("THis happened")
+            return render_template('apply.html')
+        elif (jobid == "profile"):
+            return redirect('/profile')
+        else:
+            sql = "SELECT * FROM profile WHERE email_id =?"
+            stmt = ibm_db.prepare(connection, sql)
+            ibm_db.bind_param(stmt, 1, session['useremail'])
+            ibm_db.execute(stmt)
+            account = ibm_db.fetch_assoc(stmt)
+            first_name = account['FIRST_NAME']
+            last_name = account['LAST_NAME']
+            mobile_no = account['MOBILE_NUMBER']
+            zipcode = account['ZIPCODE']
+            education = account['EDUCATION']
+            countries = account['COUNTRY']
+            states = account['STATEE']
+            city = account['CITY']
+            experience = account['EXPERIENCE']
+            job_title = account['JOB_TITLE']
+            return render_template('apply.html', email=session['useremail'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, mobile_no=mobile_no, city=city, job_title=job_title)
+
     else:
         return redirect('/login')
 
@@ -463,21 +487,25 @@ def applysuccess():
             country = request.form.get('countries')
             state = request.form.get('states')
             experience = request.form.get('experience')
-            insert_sql = "INSERT INTO appliedcompany(first_name,last_name,mobile_number,zipcode,city,email,education,country,state,experience) VALUES (?,?,?,?,?,?,?,?,?,?)"
+            insert_sql = "INSERT INTO appliedcompany(userid,jobid,first_name,last_name,mobile_number,zipcode,city,email,education,country,state,experience) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
             prep_stmt = ibm_db.prepare(connection, insert_sql)
-            ibm_db.bind_param(prep_stmt, 1, first_name)
-            ibm_db.bind_param(prep_stmt, 2, last_name)
-            ibm_db.bind_param(prep_stmt, 3, mobile_no)
-            ibm_db.bind_param(prep_stmt, 4, zipcode)
-            ibm_db.bind_param(prep_stmt, 5, city)
-            ibm_db.bind_param(prep_stmt, 6, session['useremail'])
-            ibm_db.bind_param(prep_stmt, 7, education)
-            ibm_db.bind_param(prep_stmt, 8, country)
-            ibm_db.bind_param(prep_stmt, 9, state)
-            ibm_db.bind_param(prep_stmt, 10, experience)
+            ibm_db.bind_param(prep_stmt, 1, session['userid'])
+            ibm_db.bind_param(prep_stmt, 2, session['appliedjobid'])
+            ibm_db.bind_param(prep_stmt, 3, first_name)
+            ibm_db.bind_param(prep_stmt, 4, last_name)
+            ibm_db.bind_param(prep_stmt, 5, mobile_no)
+            ibm_db.bind_param(prep_stmt, 6, zipcode)
+            ibm_db.bind_param(prep_stmt, 7, city)
+            ibm_db.bind_param(prep_stmt, 8, session['useremail'])
+            ibm_db.bind_param(prep_stmt, 9, education)
+            ibm_db.bind_param(prep_stmt, 10, country)
+            ibm_db.bind_param(prep_stmt, 11, state)
+            ibm_db.bind_param(prep_stmt, 12, experience)
+
             ibm_db.execute(prep_stmt)
-            return render_template('applysuccess.html')
+            return redirect('/applysuccess')
         else:
-            return redirect("/home")
+            return render_template('applysuccess.html'), {"Refresh": "5; url=/home"}
+
     else:
         return redirect('/home')

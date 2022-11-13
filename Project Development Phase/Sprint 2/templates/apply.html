@@ -10,6 +10,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../static/apply.css">
 </head>
+<script>
+    function redirectToApplySuccess() {
+
+        window.location.href = "/applysuccess"
+    }
+</script>
 
 <body>
     <div class="navbar-wrapper fixed">
@@ -54,7 +60,7 @@
                             </div>
                             <div class="col-md-12"><label class="labels">Zipcode</label><input type="text"
                                     class="form-control" placeholder="Zipcode" name="zipcode" value="{{zipcode}}"
-                                    disabled>
+                                    readonly>
                             </div>
                             <div class="col-md-12"><label class="labels">City</label><input type="text"
                                     class="form-control" placeholder="Enter City" value="{{city}}" name="city" readonly>
@@ -82,7 +88,7 @@
                                     class="form-control" name="experience" value="{{experience}}" readonly>
                             </div>
                             <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="submit"
-                                    onclick="">Apply
+                                    onclick="redirectToApplySuccess()">Apply
                                     Job</button></div>
                         </div>
                     </div>

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
+
 body {
     font-family: 'Titillium Web', sans-serif;
     background: url('Images/Building.jpg') no-repeat center;
@@ -11,9 +13,22 @@ body {
     background-size: 100% 100%;
 }
 
-.container{
+.container {
     width: 90%;
     height: 90%;
     background-color: white;
-    opacity: 0.6;
+    opacity: 0.8;
+}
+
+span {
+    font-size: xx-large;
+    position: relative;
+    top: 39%;
+    left: 10%;
+    padding-right: 8%;
+    padding-left: 8%;
+    width: fit-content;
+    opacity: 1;
+    color: black;
+    display: inline-block;
 }

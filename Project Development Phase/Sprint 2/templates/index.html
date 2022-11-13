@@ -62,7 +62,12 @@
 			logo.src = clickedcompany.logo
 		}
 		function redirectToApply() {
-			window.location.href = "/apply"
+			let jobid = document.getElementById('jobid').innerText
+			console.log(jobid)
+			const request = new XMLHttpRequest()
+			request.open('POST', `/apply/${JSON.stringify(jobid)}`)
+			request.send()
+			 window.location.href = `/apply/${JSON.stringify(jobid)}`
 		}
 	</script>
 </head>
@@ -121,6 +126,7 @@
 				<a id="link" target="_blank">
 					<div class="Aboutcompany"><b>About Company</b></div>
 				</a>
+				<p>{{msg}}</p>
 			</div>
 			<div class="outboxinbox2">
 				<div>
