@@ -7,7 +7,7 @@ from random import randint
 import google.auth.transport.requests
 import ibm_db
 import requests
-from flask import Flask, abort, redirect, render_template, request, session
+from flask import Flask, abort, redirect, render_template, request, session, Response
 from flask_mail import Mail, Message
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
@@ -432,24 +432,27 @@ def forgotpass():
     i = 0
     return render_template('forgotpass.html')
 
-
 @app.route("/apply/<string:jobid>", methods=["POST", "GET"])
 def apply(jobid):
     if "useremail" in session:
         if request.method == "POST":
-            session['appliedjobid'] = int(json.loads(jobid))
+            session['appliedjobid'] = json.loads(jobid)
             stmt = ibm_db.prepare(
                 connection, "select * from appliedcompany where userid=?")
             ibm_db.bind_param(stmt, 1, session['userid'])
+            print("user id is ", session['userid'])
             ibm_db.execute(stmt)
             account = ibm_db.fetch_assoc(stmt)
+            print("applied job id is ", session['appliedjobid'])
             while (account != False):
-                print(session['appliedjobid'])
-                if (session['appliedjobid'] == account["JOBID"]):
-                    return render_template('index.html', msg="You have already applied for this job!")
+                print('Job id is ', account['JOBID'])
+                if (session['appliedjobid'] == str(account["JOBID"])):
+                    print('inside if')
+                    return render_template("index.html", msg="You have already applied for this job!")
                 account = ibm_db.fetch_assoc(stmt)
             print("THis happened")
-            return render_template('apply.html')
+            
+            return redirect("/apply")
         elif (jobid == "profile"):
             return redirect('/profile')
         else:
@@ -469,10 +472,12 @@ def apply(jobid):
             experience = account['EXPERIENCE']
             job_title = account['JOB_TITLE']
             return render_template('apply.html', email=session['useremail'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, mobile_no=mobile_no, city=city, job_title=job_title)
-
     else:
         return redirect('/login')
 
+@app.route("/apply", methods=["POST", "GET"])
+def apply_get():
+    return render_template('apply.html')
 
 @app.route("/applysuccess", methods=["POST", 'GET'])
 def applysuccess():

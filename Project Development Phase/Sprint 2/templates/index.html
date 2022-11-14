@@ -64,10 +64,23 @@
 		function redirectToApply() {
 			let jobid = document.getElementById('jobid').innerText
 			console.log(jobid)
-			const request = new XMLHttpRequest()
-			request.open('POST', `/apply/${JSON.stringify(jobid)}`)
-			request.send()
-			 window.location.href = `/apply/${JSON.stringify(jobid)}`
+			console.log("Click Click ", jobid)
+			// const request = new XMLHttpRequest()
+			// request.open('POST', `/apply/${jobid}`)
+			// request.send()
+
+			// fetch(`/apply/${jobid}`, {method:"POST"}).then(res => {
+			// 	console.log("Res came", res)
+			// 	// window.location = '/apply'
+			// 	if(res.headers['Location']){
+			// 		window.location = res.headers['Location']
+			// 	}
+			// })
+			var form = document.createElement("form");
+			document.body.appendChild(form);
+			form.method = "POST";
+			form.action = "/apply/" + jobid;
+			form.submit();
 		}
 	</script>
 </head>
