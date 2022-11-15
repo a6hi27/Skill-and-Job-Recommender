@@ -1,4 +1,3 @@
-import csv
 import json
 import os
 import pathlib
@@ -7,13 +6,13 @@ from random import randint
 import google.auth.transport.requests
 import ibm_db
 import requests
-from flask import Flask, abort, redirect, render_template, request, session, Response
+from flask import Flask, abort, redirect, render_template, request, session
 from flask_mail import Mail, Message
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 
-connectionstring = "DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31864;PROTOCOL=TCPIP;UID=mzh43207;PWD=pLYMGfSprZntFyaz;SECURITY=SSL;"
+connectionstring="DATABASE=bludb;HOSTNAME=3883e7e4-18f5-4afe-be8c-fa31c41761d2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31498;PROTOCOL=TCPIP;UID=kmy46098;PWD=PN0aG7meNBbB7HH1;SECURITY=SSL;"
 
 connection = ibm_db.connect(connectionstring, '', '')
 app = Flask(__name__)
@@ -206,36 +205,51 @@ def logout():
 def home():
     if "useremail" in session:
         if request.method == 'POST':
-            user_search = request.form.get('search')
+            user_search = request.form.get(
+                'search').replace(" ", "").casefold()
             arr = []
-            with open("Company_Database.csv", 'r') as file:
-                csvreader = csv.reader(file)
-                for i in csvreader:
-                    if i[2].casefold() == user_search.casefold():
-                        dict = {
-                            'jobid': i[0], 'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link': i[9], 'logo': i[10]
-                        }
-                        arr.append(dict)
+            sql = "SELECT * FROM COMPANY"
+            stmt = ibm_db.exec_immediate(connection, sql)
+            while dictionary != False:
+                if dictionary['COMPANY_NAME'].replace(" ", "").casefold() == user_search or dictionary['ROLE'].replace(" ", "").casefold() == user_search or dictionary['SKILL_1'].replace(" ", "").casefold() == user_search or dictionary['SKILL_2'].replace(" ", "").casefold() == user_search or dictionary['SKILL_3'].replace(" ", "").casefold() == user_search:
+                    dict = {
+                        'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO']
+                    }
+                    arr.append(dict)
+                dictionary = ibm_db.fetch_assoc(stmt)
             companies = json.dumps(arr)
 
             return render_template("index.html", companies=companies, arr=arr)
         else:
-            sql = "SELECT * FROM appliedcompany WHERE userid =?"
-            stmt = ibm_db.prepare(connection, sql)
-            ibm_db.bind_param(stmt, 1, session['userid'])
+            arr=[]
+            sql = "SELECT * FROM COMPANY where skill_1 = ? or skill_2 = ? or skill_3 = ?"
+            ibm_db.bind_param(stmt, 1, session['skill'])
+            ibm_db.bind_param(stmt, 2, session['skill'])
+            ibm_db.bind_param(stmt, 3, session['skill'])
             ibm_db.execute(stmt)
-            account = ibm_db.fetch_assoc(stmt)
-            arr = []
-            with open("Company_Database.csv", 'r') as file:
-                csvreader = csv.reader(file)
-                for i in csvreader:
-                    if i[2].casefold() == session['role'].casefold():
-                        dict = {
-                            'jobid': i[0], 'cname': i[1], 'role': i[2], 'ex': i[3], 'skill': i[4], 'vacancy': i[5], 'stream': i[6], 'job_location': i[7], 'salary': i[8], 'link': i[9], 'logo': i[10]
-                        }
-                        arr.append(dict)
+            dictionary = ibm_db.fetch_assoc(stmt)
+            while dictionary != False:
+                dict = {
+                    'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO']
+                }
+                arr.append(dict)
+                dictionary = ibm_db.fetch_assoc(stmt)
+            arr.reverse()
             companies = json.dumps(arr)
-            return render_template("index.html", companies=companies, arr=arr)
+            # msg = getattr(session, 'msg', "")
+            # print(session)
+            # print("msg = ", msg)
+            # if(getattr(session, 'msg', None) is not None):
+            #     session.pop('msg')
+            msg = ''
+            if (session.get('msg') is not None):
+                msg = session.get('msg')
+                session.pop('msg')
+            error = False
+            if (session.get('error') is not None):
+                error = session.get('error')
+                session.pop('error')
+            return render_template("index.html", companies=companies, arr=arr, msg=msg, error=error)
     else:
         return redirect('/login')
 
@@ -432,6 +446,7 @@ def forgotpass():
     i = 0
     return render_template('forgotpass.html')
 
+
 @app.route("/apply/<string:jobid>", methods=["POST", "GET"])
 def apply(jobid):
     if "useremail" in session:
@@ -444,40 +459,47 @@ def apply(jobid):
             ibm_db.execute(stmt)
             account = ibm_db.fetch_assoc(stmt)
             print("applied job id is ", session['appliedjobid'])
+            print(account)
             while (account != False):
                 print('Job id is ', account['JOBID'])
-                if (session['appliedjobid'] == str(account["JOBID"])):
+                if (session['appliedjobid'] == account["JOBID"]):
                     print('inside if')
-                    return render_template("index.html", msg="You have already applied for this job!")
+                    session['msg'] = "You have already applied for this job!"
+                    session['error'] = True
+                    # return render_template("index.html", msg="You have already applied for this job!")
+                    return redirect("/home")
                 account = ibm_db.fetch_assoc(stmt)
             print("THis happened")
-            
-            return redirect("/apply")
-        elif (jobid == "profile"):
-            return redirect('/profile')
-        else:
-            sql = "SELECT * FROM profile WHERE email_id =?"
-            stmt = ibm_db.prepare(connection, sql)
-            ibm_db.bind_param(stmt, 1, session['useremail'])
-            ibm_db.execute(stmt)
-            account = ibm_db.fetch_assoc(stmt)
-            first_name = account['FIRST_NAME']
-            last_name = account['LAST_NAME']
-            mobile_no = account['MOBILE_NUMBER']
-            zipcode = account['ZIPCODE']
-            education = account['EDUCATION']
-            countries = account['COUNTRY']
-            states = account['STATEE']
-            city = account['CITY']
-            experience = account['EXPERIENCE']
-            job_title = account['JOB_TITLE']
-            return render_template('apply.html', email=session['useremail'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, mobile_no=mobile_no, city=city, job_title=job_title)
+
+            # return redirect("/apply")
+        # elif (jobid == "profile"):
+        #     return redirect('/profile')
+        # else:
+        sql = "SELECT * FROM profile WHERE email_id =?"
+        stmt = ibm_db.prepare(connection, sql)
+        ibm_db.bind_param(stmt, 1, session['useremail'])
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+        first_name = account['FIRST_NAME']
+        last_name = account['LAST_NAME']
+        mobile_no = account['MOBILE_NUMBER']
+        zipcode = account['ZIPCODE']
+        education = account['EDUCATION']
+        countries = account['COUNTRY']
+        states = account['STATEE']
+        city = account['CITY']
+        experience = account['EXPERIENCE']
+        job_title = account['JOB_TITLE']
+        return render_template('apply.html', email=session['useremail'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, mobile_no=mobile_no, city=city, job_title=job_title)
     else:
         return redirect('/login')
 
-@app.route("/apply", methods=["POST", "GET"])
-def apply_get():
-    return render_template('apply.html')
+# @app.route("/apply", methods=["POST", "GET"])
+# def apply_get():
+#     userId = session['userid']
+#     print("user id is ", session['userid'])
+#     return render_template('apply.html')
+
 
 @app.route("/applysuccess", methods=["POST", 'GET'])
 def applysuccess():
@@ -514,3 +536,79 @@ def applysuccess():
 
     else:
         return redirect('/home')
+
+
+@app.route("/adminlogin", methods=['GET', 'POST'])
+def adminlogin():
+    if request.method == 'POST':
+        useremail = request.form.get('email')
+        password = request.form.get('password')
+        sql = "SELECT * FROM admin WHERE email =?"
+        stmt = ibm_db.prepare(connection, sql)
+        ibm_db.bind_param(stmt, 1, useremail)
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+        if account:
+            session["useremail"] = useremail
+            if (password == str(account['PASS']).strip()):
+                return render_template('adminhome.html')
+            else:
+                return render_template('adminlogin.html', msg="Password is invalid")
+        else:
+            return render_template('adminlogin.html', msg="Email is invalid")
+    else:
+        return render_template('adminlogin.html')
+
+
+@app.route("/adminhome", methods=['GET', 'POST'])
+def adminhome():
+    if "useremail" in session:
+        if request.method == 'POST':
+            company_name = request.form.get('company_name')
+            role = request.form.get('role')
+            skill_1 = request.form.get('skill_1')
+            skill_2 = request.form.get('skill_2')
+            skill_3 = request.form.get('skill_3')
+            vacancy = request.form.get('vacancy')
+            stream = request.form.get('stream')
+            job_location = request.form.get('job_location')
+            salary = request.form.get('salary')
+            experience = request.form.get('experience')
+            link = request.form.get('link')
+            logo = request.form.get('logo')
+
+            insert_sql = "INSERT INTO company (company_name, role, experience, skill_1, skill_2, skill_3, vacancy, stream, job_location, salary, website, logo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+
+            prep_stmt = ibm_db.prepare(connection, insert_sql)
+            ibm_db.bind_param(prep_stmt, 1, company_name)
+            ibm_db.bind_param(prep_stmt, 2, role)
+            ibm_db.bind_param(prep_stmt, 3, experience)
+            ibm_db.bind_param(prep_stmt, 4, skill_1)
+            ibm_db.bind_param(prep_stmt, 5, skill_2)
+            ibm_db.bind_param(prep_stmt, 6, skill_3)
+            ibm_db.bind_param(prep_stmt, 7, vacancy)
+            ibm_db.bind_param(prep_stmt, 8, stream)
+            ibm_db.bind_param(prep_stmt, 9, job_location)
+            ibm_db.bind_param(prep_stmt, 10, salary)
+            ibm_db.bind_param(prep_stmt, 11, link)
+            ibm_db.bind_param(prep_stmt, 12, logo)
+            ibm_db.execute(prep_stmt)
+
+            sql = 'SELECT email_id from profile Where skill = ? or skill = ? or skill = ?'
+            stmt = ibm_db.prepare(connection, sql)
+            ibm_db.bind_param(stmt, 1, skill_1)
+            ibm_db.bind_param(stmt, 2, skill_2)
+            ibm_db.bind_param(stmt, 3, skill_3)
+            ibm_db.execute(stmt)
+            account = ibm_db.fetch_assoc(stmt)
+            while account != False:
+                msg = Message(subject='OTP', sender='hackjacks@gmail.com',
+                              recipients=[account['EMAIL_ID']])
+                msg.body = company_name+" posted a new job"
+                mail.send(msg)
+                account = ibm_db.fetch_assoc(stmt)
+            return render_template('adminhome.html')
+
+        return render_template('adminhome.html')
+    else:
+        return render_template('adminlogin.html')

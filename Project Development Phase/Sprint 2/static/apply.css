@@ -48,3 +48,10 @@ body {
 input.form-control:disabled{
     background-color: #abd5ff;
 }
+
+.form-control{
+    border-color: #48abe0;
+    border-style: solid;
+    box-shadow: 0 0 10px 5px #48abe0,
+
+}

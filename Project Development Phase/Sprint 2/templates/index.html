@@ -38,7 +38,9 @@
 			var cname = document.getElementById('cname')
 			var role = document.getElementById('role')
 			var salary = document.getElementById('salary')
-			var skill = document.getElementById('skill')
+			var skill_1 = document.getElementById('skill_1')
+			var skill_2 = document.getElementById('skill_2')
+			var skill_3 = document.getElementById('skill_3')
 			var ex = document.getElementById('ex')
 			var job_location = document.getElementById('job_location')
 			var vacancy = document.getElementById('vacancy')
@@ -54,7 +56,9 @@
 			cname.innerHTML = clickedcompany.cname
 			role.innerHTML = clickedcompany.role
 			salary.innerHTML = clickedcompany.salary
-			skill.innerHTML = clickedcompany.skill
+			skill_1.innerHTML = clickedcompany.skill_1
+			skill_2.innerHTML = clickedcompany.skill_2
+			skill_3.innerHTML = clickedcompany.skill_3
 			ex.innerHTML = clickedcompany.ex
 			job_location.innerHTML = clickedcompany.job_location
 			vacancy.innerHTML = clickedcompany.vacancy
@@ -76,11 +80,16 @@
 			// 		window.location = res.headers['Location']
 			// 	}
 			// })
-			var form = document.createElement("form");
-			document.body.appendChild(form);
-			form.method = "POST";
-			form.action = "/apply/" + jobid;
-			form.submit();
+			if(jobid != ''){
+				var form = document.createElement("form");
+				document.body.appendChild(form);
+				form.method = "POST";
+				form.action = "/apply/" + jobid;
+				form.submit();
+			}else {
+				alert("Please select the Job first")
+			}
+			
 		}
 	</script>
 </head>
@@ -156,7 +165,9 @@
 				<div>
 					<ion-icon class="iconclr" name="book-outline"></ion-icon><b>Skills Required</b>
 					<ul>
-						<li class="describe" id="skill"></li>
+						<li class="describe" id="skill_1"></li>
+						<li class="describe" id="skill_2"></li>
+						<li class="describe" id="skill_3"></li>
 					</ul>
 				</div>
 				<div>
@@ -187,14 +198,14 @@
 				<spam>
 					<img class="companylogo" src='{{i.logo}}'>
 				</spam>
-				<li><b>Company Name : <button id='{{i.cname}}'
+				<li><b>Company Name : <button id='{{i.jobid}}'
 							style="border: none; background-color: transparent;color: blue;"
 							onclick="companydetails(this)">{{i.cname}}</button></b>
 				</li>
 				<ul style="list-style:none;">
 					<li>Role : {{i.role}}</li>
 					<li>Experience: {{i.ex}}</li>
-					<li>Skill : {{i.skill}}</li>
+					<li>Skill : {{i.skill_1}},{{i.skill_2}},{{i.skill_3}}</li>
 					<li>Vacancy : {{i.vacancy}}</li>
 					<li>Stream : {{i.stream}}</li>
 					<li>Job Location : {{i.job_location}}</li>
