@@ -13,7 +13,11 @@
 	<!-- <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">-->
 	<link rel="stylesheet" href="../static/index.css">
 	<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-	<script>		$(document).ready(function () {
+	<script>
+		document.addEventListener("DOMContentLoaded", function(){
+    
+});
+			$(document).ready(function () {
 			$('.content').click(function () {
 				$('.content').toggleClass("heart-active")
 				$('.text').toggleClass("heart-active")
@@ -46,24 +50,26 @@
 			var vacancy = document.getElementById('vacancy')
 			var link = document.getElementById('link')
 			var logo = document.getElementById('logo')
+			var description = document.getElementById('description')
 
 			var json = JSON.parse(decodeHtml('{{companies}}'));
 			var id = obj.getAttribute('id');
 			var clickedcompany = json.find(function (obj) {
-				return obj.cname === id;
+				return obj.jobid == id;
 			});
 			jobid.innerHTML = clickedcompany.jobid
 			cname.innerHTML = clickedcompany.cname
 			role.innerHTML = clickedcompany.role
-			salary.innerHTML = clickedcompany.salary
+			salary.innerHTML = clickedcompany.salary+" LPA"
 			skill_1.innerHTML = clickedcompany.skill_1
 			skill_2.innerHTML = clickedcompany.skill_2
 			skill_3.innerHTML = clickedcompany.skill_3
-			ex.innerHTML = clickedcompany.ex
+			ex.innerHTML = clickedcompany.ex+" Years"
 			job_location.innerHTML = clickedcompany.job_location
 			vacancy.innerHTML = clickedcompany.vacancy
 			link.href = clickedcompany.link
 			logo.src = clickedcompany.logo
+			description.innerHTML=clickedcompany.description
 		}
 		function redirectToApply() {
 			let jobid = document.getElementById('jobid').innerText
@@ -86,10 +92,7 @@
 				form.method = "POST";
 				form.action = "/apply/" + jobid;
 				form.submit();
-			}else {
-				alert("Please select the Job first")
 			}
-			
 		}
 	</script>
 </head>
@@ -128,12 +131,12 @@
 		<div class='outbox'>
 			<div class="outboxinbox">
 				<spam>
-					<img class="companylogooutbox" id="logo">
+					<img class="companylogooutbox" id="logo" src="{{arr[0].logo}}">
 				</spam>
-				<div id="jobid" style="display: none;"></div>
-				<div style="color: rgb(66, 66, 130);" id="cname"><b>Company Name</b></div>
-				<div style="color: rgb(82, 82, 108); " id="role"><b>Role</b></div>
-				<div id="salary">Salary</div>
+				<div id="jobid" style="display: none;">{{arr[0].jobid}}</div>
+				<div style="color: rgb(66, 66, 130);" id="cname"><b>{{arr[0].cname}}</b></div>
+				<div style="color: rgb(82, 82, 108); " id="role"><b>{{arr[0].role}}</b></div>
+				<div id="salary">{{arr[0].salary}} LPA</div>
 				<div class="applybox">
 
 					<button class="applyjob" type="submit" onclick="redirectToApply()">Apply Job</button>
@@ -145,7 +148,7 @@
 						</div>
 					</div>
 				</div>
-				<a id="link" target="_blank">
+				<a id="link" href="{{arr[0].link}}" target="_blank">
 					<div class="Aboutcompany"><b>About Company</b></div>
 				</a>
 				<p>{{msg}}</p>
@@ -153,27 +156,20 @@
 			<div class="outboxinbox2">
 				<div>
 					<ion-icon class="iconclr" name="newspaper-outline"></ion-icon><b>Job Description</b>
-
-					<p class="describe">Prepare and conduct UX research.
-						Outline audience personas according to brand, business and user requirements.
-						Visualize the user journey from start to finish and articulate it through experience design.
-						Prioritize content, functions and features according to strategic research.
-						Create and develop clean, end-to-end user experiences that meet project goals and
-						objectives.
-						Deliver user flows.</p>
+					<p class="describe" id="description">{{arr[0].description}}</p>
 				</div>
 				<div>
 					<ion-icon class="iconclr" name="book-outline"></ion-icon><b>Skills Required</b>
 					<ul>
-						<li class="describe" id="skill_1"></li>
-						<li class="describe" id="skill_2"></li>
-						<li class="describe" id="skill_3"></li>
+						<li class="describe" id="skill_1">{{arr[0].skill_1}}</li>
+						<li class="describe" id="skill_2">{{arr[0].skill_2}}</li>
+						<li class="describe" id="skill_3">{{arr[0].skill_3}}</li>
 					</ul>
 				</div>
 				<div>
 					<ion-icon class="iconclr" name="bag-check-outline"></ion-icon><b>Experience</b>
 					<ul>
-						<li class="describe" id="ex"></li>
+						<li class="describe" id="ex">{{arr[0].ex}}</li>
 					</ul>
 				</div>
 				<div>
@@ -181,13 +177,13 @@
 					<ul>
 						<spam class="icon">
 						</spam>
-						<li class="describe" id="job_location"></li>
+						<li class="describe" id="job_location">{{arr[0].job_location}}</li>
 					</ul>
 				</div>
 				<div>
 					<ion-icon class="iconclr" name="apps-outline"></ion-icon><b>Vacancy</b>
 					<ul>
-						<li class="describe" id="vacancy"></li>
+						<li class="describe" id="vacancy">{{arr[0].vacancy}}</li>
 					</ul>
 				</div>
 			</div>
@@ -204,12 +200,12 @@
 				</li>
 				<ul style="list-style:none;">
 					<li>Role : {{i.role}}</li>
-					<li>Experience: {{i.ex}}</li>
+					<li>Experience: {{i.ex}} Years</li>
 					<li>Skill : {{i.skill_1}},{{i.skill_2}},{{i.skill_3}}</li>
 					<li>Vacancy : {{i.vacancy}}</li>
 					<li>Stream : {{i.stream}}</li>
 					<li>Job Location : {{i.job_location}}</li>
-					<li>Salary : {{i.salary}}</li>
+					<li>Salary : {{i.salary}} LPA</li>
 				</ul>
 			</div>
 		</div>

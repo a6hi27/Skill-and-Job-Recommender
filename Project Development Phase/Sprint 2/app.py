@@ -12,7 +12,7 @@ from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 
-connectionstring="DATABASE=bludb;HOSTNAME=3883e7e4-18f5-4afe-be8c-fa31c41761d2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31498;PROTOCOL=TCPIP;UID=kmy46098;PWD=PN0aG7meNBbB7HH1;SECURITY=SSL;"
+connectionstring="DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31864;PROTOCOL=TCPIP;UID=mzh43207;PWD=pLYMGfSprZntFyaz;SECURITY=SSL;"
 
 connection = ibm_db.connect(connectionstring, '', '')
 app = Flask(__name__)
@@ -210,19 +210,22 @@ def home():
             arr = []
             sql = "SELECT * FROM COMPANY"
             stmt = ibm_db.exec_immediate(connection, sql)
+            dictionary = ibm_db.fetch_assoc(stmt)
             while dictionary != False:
                 if dictionary['COMPANY_NAME'].replace(" ", "").casefold() == user_search or dictionary['ROLE'].replace(" ", "").casefold() == user_search or dictionary['SKILL_1'].replace(" ", "").casefold() == user_search or dictionary['SKILL_2'].replace(" ", "").casefold() == user_search or dictionary['SKILL_3'].replace(" ", "").casefold() == user_search:
                     dict = {
-                        'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO']
+                        'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description':dictionary['DESCRIPTION']
                     }
                     arr.append(dict)
                 dictionary = ibm_db.fetch_assoc(stmt)
             companies = json.dumps(arr)
+          
 
             return render_template("index.html", companies=companies, arr=arr)
         else:
             arr=[]
             sql = "SELECT * FROM COMPANY where skill_1 = ? or skill_2 = ? or skill_3 = ?"
+            stmt=ibm_db.prepare(connection, sql)
             ibm_db.bind_param(stmt, 1, session['skill'])
             ibm_db.bind_param(stmt, 2, session['skill'])
             ibm_db.bind_param(stmt, 3, session['skill'])
@@ -230,12 +233,13 @@ def home():
             dictionary = ibm_db.fetch_assoc(stmt)
             while dictionary != False:
                 dict = {
-                    'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO']
+                    'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description':dictionary['DESCRIPTION']
                 }
                 arr.append(dict)
                 dictionary = ibm_db.fetch_assoc(stmt)
             arr.reverse()
             companies = json.dumps(arr)
+            print
             # msg = getattr(session, 'msg', "")
             # print(session)
             # print("msg = ", msg)
@@ -245,11 +249,7 @@ def home():
             if (session.get('msg') is not None):
                 msg = session.get('msg')
                 session.pop('msg')
-            error = False
-            if (session.get('error') is not None):
-                error = session.get('error')
-                session.pop('error')
-            return render_template("index.html", companies=companies, arr=arr, msg=msg, error=error)
+            return render_template("index.html", companies=companies, arr=arr, msg=msg)
     else:
         return redirect('/login')
 
@@ -289,7 +289,7 @@ def login():
                     ibm_db.bind_param(stmt, 1, useremail)
                     ibm_db.execute(stmt)
                     account = ibm_db.fetch_assoc(stmt)
-                    session['role'] = account['JOB_TITLE']
+                    session['skill'] = account['SKILL']
                     return redirect('/home')
             else:
                 return render_template('signin.html', msg="Password is invalid")
@@ -317,7 +317,7 @@ def profile():
             country = request.form.get('countries')
             state = request.form.get('states')
             experience = request.form.get('experience')
-            job_title = request.form.get('job_title')
+            skill = request.form.get('skill')
 
             insert_sql = "INSERT INTO profile VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
@@ -334,7 +334,7 @@ def profile():
             ibm_db.bind_param(prep_stmt, 10, country)
             ibm_db.bind_param(prep_stmt, 11, state)
             ibm_db.bind_param(prep_stmt, 12, experience)
-            ibm_db.bind_param(prep_stmt, 13, job_title)
+            ibm_db.bind_param(prep_stmt, 13, skill)
             ibm_db.execute(prep_stmt)
 
             insert_sql = "UPDATE USER SET newuser = false WHERE email=?"
@@ -342,7 +342,7 @@ def profile():
             prep_stmt = ibm_db.prepare(connection, insert_sql)
             ibm_db.bind_param(prep_stmt, 1, session['useremail'])
             ibm_db.execute(prep_stmt)
-            session['role'] = job_title
+            session['skill'] = skill
             return redirect('/home')
 
         elif (session['newuser'] == 0 and request.method == "GET"):
@@ -362,8 +362,8 @@ def profile():
             states = account['STATEE']
             city = account['CITY']
             experience = account['EXPERIENCE']
-            job_title = account['JOB_TITLE']
-            return render_template('profile.html', email=session['useremail'], newuser=session['newuser'], first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, job_title=job_title, mobile_no=mobile_no, city=city)
+            skill = account['SKILL']
+            return render_template('profile.html', email=session['useremail'], newuser=session['newuser'], first_name=first_name, last_name=last_name, address_line_1=address_line_1, address_line_2=address_line_2, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, skill=skill, mobile_no=mobile_no, city=city)
 
         elif (session['newuser'] == 0 and request.method == "POST"):
             mobile_no = request.form.get('mobile_no')
@@ -374,8 +374,8 @@ def profile():
             country = request.form.get('countries')
             state = request.form.get('states')
             experience = request.form.get('experience')
-            job_title = request.form.get('job_title')
-            sql = "UPDATE profile SET(mobile_number,address_line_1,address_line_2,zipcode,city,country,statee,experience,job_title)=(?,?,?,?,?,?,?,?,?) where email_id =?"
+            skill = request.form.get('skill')
+            sql = "UPDATE profile SET(mobile_number,address_line_1,address_line_2,zipcode,city,country,statee,experience,skill)=(?,?,?,?,?,?,?,?,?) where email_id =?"
             stmt = ibm_db.prepare(connection, sql)
             ibm_db.bind_param(stmt, 1, mobile_no)
             ibm_db.bind_param(stmt, 2, address_line_1)
@@ -385,10 +385,10 @@ def profile():
             ibm_db.bind_param(stmt, 6, country)
             ibm_db.bind_param(stmt, 7, state)
             ibm_db.bind_param(stmt, 8, experience)
-            ibm_db.bind_param(stmt, 9, job_title)
+            ibm_db.bind_param(stmt, 9, skill)
             ibm_db.bind_param(stmt, 10, session['useremail'])
             ibm_db.execute(stmt)
-            session['role'] = job_title
+            session['skill'] = skill
             return redirect("/home")
         else:
             return render_template('profile.html', newuser=session['newuser'], email=session['useremail'])
@@ -403,7 +403,6 @@ def forgotpass():
     global email
 
     if request.method == 'POST':
-
         useremail = request.form.get('email')
         user_otp = request.form.get('OTP')
         password = request.form.get('password')
@@ -489,8 +488,7 @@ def apply(jobid):
         states = account['STATEE']
         city = account['CITY']
         experience = account['EXPERIENCE']
-        job_title = account['JOB_TITLE']
-        return render_template('apply.html', email=session['useremail'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, mobile_no=mobile_no, city=city, job_title=job_title)
+        return render_template('apply.html', email=session['useremail'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, mobile_no=mobile_no, city=city)
     else:
         return redirect('/login')
 
