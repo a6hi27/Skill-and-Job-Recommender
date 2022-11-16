@@ -9,6 +9,12 @@ body {
   text-decoration: double;
 }
 
+img#logo.companylogooutbox {
+  width: 100px;
+  height: 100px;
+  object-fit: scale-down;
+}
+
 .logo {
   display: flex;
   justify-content: center;
@@ -193,9 +199,9 @@ button.applyjob {
 .companylogo {
   position: static;
   margin-left: 5%;
-  margin-top: 5%;
-  margin-bottom: 5%;
-  width: 30%;
+  width: 100px;
+  height: 100px;
+  object-fit: scale-down;
 }
 
 .companylogooutbox {

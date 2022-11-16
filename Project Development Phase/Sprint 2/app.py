@@ -12,7 +12,7 @@ from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 
-connectionstring="DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31864;PROTOCOL=TCPIP;UID=mzh43207;PWD=pLYMGfSprZntFyaz;SECURITY=SSL;"
+connectionstring = "DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31864;PROTOCOL=TCPIP;UID=mzh43207;PWD=pLYMGfSprZntFyaz;SECURITY=SSL;"
 
 connection = ibm_db.connect(connectionstring, '', '')
 app = Flask(__name__)
@@ -176,7 +176,7 @@ def callback():
         ibm_db.bind_param(prostmt, 1, useremail)
         ibm_db.execute(prostmt)
         proaccount = ibm_db.fetch_assoc(prostmt)
-        session['role'] = proaccount['JOB_TITLE']
+        session['role'] = proaccount['SKILL']
         return redirect('/home')
 
     else:
@@ -198,6 +198,8 @@ def logout():
     session.pop('newuser', None)
     session.pop('role', None)
     session.pop('userid', None)
+    session.pop('mailcompany', None)
+    session.pop('appliedjobid', None)
     return redirect("/login")
 
 
@@ -214,18 +216,17 @@ def home():
             while dictionary != False:
                 if dictionary['COMPANY_NAME'].replace(" ", "").casefold() == user_search or dictionary['ROLE'].replace(" ", "").casefold() == user_search or dictionary['SKILL_1'].replace(" ", "").casefold() == user_search or dictionary['SKILL_2'].replace(" ", "").casefold() == user_search or dictionary['SKILL_3'].replace(" ", "").casefold() == user_search:
                     dict = {
-                        'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description':dictionary['DESCRIPTION']
+                        'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description': dictionary['DESCRIPTION']
                     }
                     arr.append(dict)
                 dictionary = ibm_db.fetch_assoc(stmt)
             companies = json.dumps(arr)
-          
 
             return render_template("index.html", companies=companies, arr=arr)
         else:
-            arr=[]
+            arr = []
             sql = "SELECT * FROM COMPANY where skill_1 = ? or skill_2 = ? or skill_3 = ?"
-            stmt=ibm_db.prepare(connection, sql)
+            stmt = ibm_db.prepare(connection, sql)
             ibm_db.bind_param(stmt, 1, session['skill'])
             ibm_db.bind_param(stmt, 2, session['skill'])
             ibm_db.bind_param(stmt, 3, session['skill'])
@@ -233,13 +234,12 @@ def home():
             dictionary = ibm_db.fetch_assoc(stmt)
             while dictionary != False:
                 dict = {
-                    'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description':dictionary['DESCRIPTION']
+                    'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description': dictionary['DESCRIPTION']
                 }
                 arr.append(dict)
                 dictionary = ibm_db.fetch_assoc(stmt)
             arr.reverse()
             companies = json.dumps(arr)
-            print
             # msg = getattr(session, 'msg', "")
             # print(session)
             # print("msg = ", msg)
@@ -474,6 +474,12 @@ def apply(jobid):
         # elif (jobid == "profile"):
         #     return redirect('/profile')
         # else:
+        jobsql = "SELECT * FROM company WHERE job_id =?"
+        jobstmt = ibm_db.prepare(connection, jobsql)
+        ibm_db.bind_param(jobstmt, 1, jobid)
+        ibm_db.execute(jobstmt)
+        appliedcompany = ibm_db.fetch_assoc(jobstmt)
+        session['mailcompany'] = appliedcompany['COMPANY_NAME']
         sql = "SELECT * FROM profile WHERE email_id =?"
         stmt = ibm_db.prepare(connection, sql)
         ibm_db.bind_param(stmt, 1, session['useremail'])
@@ -528,6 +534,11 @@ def applysuccess():
             ibm_db.bind_param(prep_stmt, 12, experience)
 
             ibm_db.execute(prep_stmt)
+            msg = Message(subject='Job Application Notification', sender='hackjacks@gmail.com',
+                          recipients=[session['useremail']])
+            msg.body = "You have applied for the job posted by " + \
+                session['mailcompany']+"\nBest of Luck!!!"
+            mail.send(msg)
             return redirect('/applysuccess')
         else:
             return render_template('applysuccess.html'), {"Refresh": "5; url=/home"}
@@ -539,16 +550,16 @@ def applysuccess():
 @app.route("/adminlogin", methods=['GET', 'POST'])
 def adminlogin():
     if request.method == 'POST':
-        useremail = request.form.get('email')
+        adminmail = request.form.get('email')
         password = request.form.get('password')
         sql = "SELECT * FROM admin WHERE email =?"
         stmt = ibm_db.prepare(connection, sql)
-        ibm_db.bind_param(stmt, 1, useremail)
+        ibm_db.bind_param(stmt, 1, adminmail)
         ibm_db.execute(stmt)
         account = ibm_db.fetch_assoc(stmt)
         if account:
-            session["useremail"] = useremail
-            if (password == str(account['PASS']).strip()):
+            session["adminmail"] = adminmail
+            if (password == str(account['PASSWORD']).strip()):
                 return render_template('adminhome.html')
             else:
                 return render_template('adminlogin.html', msg="Password is invalid")
@@ -560,7 +571,7 @@ def adminlogin():
 
 @app.route("/adminhome", methods=['GET', 'POST'])
 def adminhome():
-    if "useremail" in session:
+    if "adminmail" in session:
         if request.method == 'POST':
             company_name = request.form.get('company_name')
             role = request.form.get('role')
@@ -574,8 +585,9 @@ def adminhome():
             experience = request.form.get('experience')
             link = request.form.get('link')
             logo = request.form.get('logo')
+            description = request.form.get('description')
 
-            insert_sql = "INSERT INTO company (company_name, role, experience, skill_1, skill_2, skill_3, vacancy, stream, job_location, salary, website, logo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+            insert_sql = "INSERT INTO company (company_name, role, experience, skill_1, skill_2, skill_3, vacancy, stream, job_location, salary, website, logo,description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
             prep_stmt = ibm_db.prepare(connection, insert_sql)
             ibm_db.bind_param(prep_stmt, 1, company_name)
@@ -590,6 +602,7 @@ def adminhome():
             ibm_db.bind_param(prep_stmt, 10, salary)
             ibm_db.bind_param(prep_stmt, 11, link)
             ibm_db.bind_param(prep_stmt, 12, logo)
+            ibm_db.bind_param(prep_stmt, 13, description)
             ibm_db.execute(prep_stmt)
 
             sql = 'SELECT email_id from profile Where skill = ? or skill = ? or skill = ?'
@@ -600,13 +613,19 @@ def adminhome():
             ibm_db.execute(stmt)
             account = ibm_db.fetch_assoc(stmt)
             while account != False:
-                msg = Message(subject='OTP', sender='hackjacks@gmail.com',
+                msg = Message(subject='Job Posting', sender='hackjacks@gmail.com',
                               recipients=[account['EMAIL_ID']])
-                msg.body = company_name+" posted a new job"
+                msg.body = company_name+"has posted a new job. We are sending you this mail since you chose one of this company's required skill as your preferred skill"
                 mail.send(msg)
                 account = ibm_db.fetch_assoc(stmt)
             return render_template('adminhome.html')
 
         return render_template('adminhome.html')
     else:
-        return render_template('adminlogin.html')
+        return redirect('/adminlogin')
+
+
+@app.route("/adminlogout")
+def adminlogout():
+    session.pop('adminmail', None)
+    return redirect("/adminlogin")
