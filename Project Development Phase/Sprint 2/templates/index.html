@@ -14,7 +14,21 @@
 	<link rel="stylesheet" href="../static/index.css">
 	<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
 	<script>
-			$(document).ready(function () {
+		window.watsonAssistantChatOptions = {
+			integrationID: "cc7db599-b8d4-419c-8072-a5c10398a665", // The ID of this integration.
+			region: "jp-tok", // The region your integration is hosted in.
+			serviceInstanceID: "4161a912-e5d2-4699-9c3e-b738e986c1e8", // The ID of your service instance.
+			onLoad: function (instance) { instance.render(); }
+		};
+		setTimeout(function () {
+			const t = document.createElement('script');
+			t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + (window.watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
+			document.head.appendChild(t);
+		});
+	</script>
+
+	<script>
+		$(document).ready(function () {
 			$('.content').click(function () {
 				$('.content').toggleClass("heart-active")
 				$('.text').toggleClass("heart-active")
@@ -57,16 +71,16 @@
 			jobid.innerHTML = clickedcompany.jobid
 			cname.innerHTML = clickedcompany.cname
 			role.innerHTML = clickedcompany.role
-			salary.innerHTML = clickedcompany.salary+" LPA"
+			salary.innerHTML = clickedcompany.salary + " LPA"
 			skill_1.innerHTML = clickedcompany.skill_1
 			skill_2.innerHTML = clickedcompany.skill_2
 			skill_3.innerHTML = clickedcompany.skill_3
-			ex.innerHTML = clickedcompany.ex+" Years"
+			ex.innerHTML = clickedcompany.ex + " Years"
 			job_location.innerHTML = clickedcompany.job_location
 			vacancy.innerHTML = clickedcompany.vacancy
 			link.href = clickedcompany.link
 			logo.src = clickedcompany.logo
-			description.innerHTML=clickedcompany.description
+			description.innerHTML = clickedcompany.description
 		}
 		function redirectToApply() {
 			let jobid = document.getElementById('jobid').innerText
@@ -83,7 +97,7 @@
 			// 		window.location = res.headers['Location']
 			// 	}
 			// })
-			if(jobid != ''){
+			if (jobid != '') {
 				var form = document.createElement("form");
 				document.body.appendChild(form);
 				form.method = "POST";
