@@ -1,4 +1,5 @@
 import json
+import unicodedata
 import os
 import pathlib
 from random import randint
@@ -17,6 +18,10 @@ connectionstring = "DATABASE=bludb;HOSTNAME=21fecfd8-47b7-4937-840d-d791d0218660
 connection = ibm_db.connect(connectionstring, '', '')
 app = Flask(__name__)
 app.debug = True
+
+
+def remove_control_characters(s):
+    return "".join(ch for ch in s if unicodedata.category(ch)[0] != "C")
 
 
 mail = Mail(app)
@@ -144,7 +149,8 @@ def callback():
     id_info = id_token.verify_oauth2_token(
         id_token=credentials._id_token,
         request=token_request,
-        audience=GOOGLE_CLIENT_ID
+        audience=GOOGLE_CLIENT_ID,
+        clock_skew_in_seconds=5
     )
 
     session["useremail"] = id_info.get("email")
@@ -176,7 +182,7 @@ def callback():
         ibm_db.bind_param(prostmt, 1, useremail)
         ibm_db.execute(prostmt)
         proaccount = ibm_db.fetch_assoc(prostmt)
-        session['role'] = proaccount['SKILL']
+        session['skill'] = proaccount['SKILL']
         return redirect('/home')
 
     else:
@@ -193,13 +199,15 @@ def callback():
 
 @app.route("/logout")
 def logout():
+    session.clear()
     session.pop('useremail', None)
     session.pop('regmail', None)
     session.pop('newuser', None)
-    session.pop('role', None)
+    session.pop('skill', None)
     session.pop('userid', None)
     session.pop('mailcompany', None)
     session.pop('appliedjobid', None)
+    session.pop('state', None)
     return redirect("/login")
 
 
@@ -216,7 +224,7 @@ def home():
             while dictionary != False:
                 if dictionary['COMPANY_NAME'].replace(" ", "").casefold() == user_search or dictionary['ROLE'].replace(" ", "").casefold() == user_search or dictionary['SKILL_1'].replace(" ", "").casefold() == user_search or dictionary['SKILL_2'].replace(" ", "").casefold() == user_search or dictionary['SKILL_3'].replace(" ", "").casefold() == user_search:
                     dict = {
-                        'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description': dictionary['DESCRIPTION']
+                        'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description': remove_control_characters(dictionary['DESCRIPTION'])
                     }
                     arr.append(dict)
                 dictionary = ibm_db.fetch_assoc(stmt)
@@ -234,8 +242,9 @@ def home():
             dictionary = ibm_db.fetch_assoc(stmt)
             while dictionary != False:
                 dict = {
-                    'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description': dictionary['DESCRIPTION']
+                    'jobid': dictionary['JOB_ID'], 'cname': dictionary['COMPANY_NAME'], 'role': dictionary['ROLE'], 'ex': dictionary['EXPERIENCE'], 'skill_1': dictionary['SKILL_1'], 'skill_2': dictionary['SKILL_2'], 'skill_3': dictionary['SKILL_3'], 'vacancy': dictionary['VACANCY'], 'stream': dictionary['STREAM'], 'job_location': dictionary['JOB_LOCATION'], 'salary': dictionary['SALARY'], 'link': dictionary['WEBSITE'], 'logo': dictionary['LOGO'], 'description': remove_control_characters(dictionary['DESCRIPTION'])
                 }
+                print(dictionary['DESCRIPTION'].replace("\n", ""))
                 arr.append(dict)
                 dictionary = ibm_db.fetch_assoc(stmt)
             arr.reverse()
@@ -454,25 +463,19 @@ def apply(jobid):
             stmt = ibm_db.prepare(
                 connection, "select * from appliedcompany where userid=?")
             ibm_db.bind_param(stmt, 1, session['userid'])
-            print("user id is ", session['userid'])
             ibm_db.execute(stmt)
             account = ibm_db.fetch_assoc(stmt)
-            print("applied job id is ", session['appliedjobid'])
-            print(account)
             while (account != False):
-                print('Job id is ', account['JOBID'])
                 if (session['appliedjobid'] == account["JOBID"]):
-                    print('inside if')
                     session['msg'] = "You have already applied for this job!"
                     session['error'] = True
                     # return render_template("index.html", msg="You have already applied for this job!")
                     return redirect("/home")
                 account = ibm_db.fetch_assoc(stmt)
-            print("THis happened")
 
             # return redirect("/apply")
-        # elif (jobid == "profile"):
-        #     return redirect('/profile')
+        elif (jobid == "profile"):
+            return redirect('/profile')
         # else:
         jobsql = "SELECT * FROM company WHERE job_id =?"
         jobstmt = ibm_db.prepare(connection, jobsql)
@@ -497,12 +500,6 @@ def apply(jobid):
         return render_template('apply.html', email=session['useremail'], first_name=first_name, last_name=last_name, zipcode=zipcode, education=education, countries=countries, states=states, experience=experience, mobile_no=mobile_no, city=city)
     else:
         return redirect('/login')
-
-# @app.route("/apply", methods=["POST", "GET"])
-# def apply_get():
-#     userId = session['userid']
-#     print("user id is ", session['userid'])
-#     return render_template('apply.html')
 
 
 @app.route("/applysuccess", methods=["POST", 'GET'])
@@ -629,3 +626,6 @@ def adminhome():
 def adminlogout():
     session.pop('adminmail', None)
     return redirect("/adminlogin")
+    
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

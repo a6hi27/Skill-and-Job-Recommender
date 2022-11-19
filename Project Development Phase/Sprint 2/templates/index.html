@@ -80,12 +80,10 @@
 			vacancy.innerHTML = clickedcompany.vacancy
 			link.href = clickedcompany.link
 			logo.src = clickedcompany.logo
-			description.innerHTML = clickedcompany.description
+			description.innerText = clickedcompany.description
 		}
 		function redirectToApply() {
 			let jobid = document.getElementById('jobid').innerText
-			console.log(jobid)
-			console.log("Click Click ", jobid)
 			// const request = new XMLHttpRequest()
 			// request.open('POST', `/apply/${jobid}`)
 			// request.send()
@@ -162,7 +160,7 @@
 				<a id="link" href="{{arr[0].link}}" target="_blank">
 					<div class="Aboutcompany"><b>About Company</b></div>
 				</a>
-				<p>{{msg}}</p>
+				<p class="errormsg">{{msg}}</p>
 			</div>
 			<div class="outboxinbox2">
 				<div>

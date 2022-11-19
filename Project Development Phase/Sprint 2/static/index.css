@@ -212,6 +212,10 @@ button.applyjob {
   margin-bottom: 2%;
 }
 
+p.errormsg{
+  margin-top: 1.5rem;
+}
+
 .fixed-top {
   position: fixed;
   top: 0;

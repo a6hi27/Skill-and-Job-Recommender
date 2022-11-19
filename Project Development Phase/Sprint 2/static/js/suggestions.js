@@ -90,7 +90,8 @@ let names = [
   "Freshworks",
   "Cisco",
   "Cartoon MAngo",
-  "GRL"
+  "GRL",
+  "Apple"
 ];
 
 let sortedNames = names.sort();
@@ -100,7 +101,7 @@ input.addEventListener("keyup", (e) => {
   for (let i of sortedNames) {
     if (
       i.toLowerCase().startsWith(input.value.toLowerCase()) &&
-      input.value != "" && count <= 2
+      input.value != ""
     ) {
       let listItem = document.createElement("li");
       listItem.classList.add("list-items");
@@ -112,7 +113,6 @@ input.addEventListener("keyup", (e) => {
       document.querySelector(".list").appendChild(listItem);
     }
   }
-  count=0;
 });
 function displayNames(value) {
   input.value = value;
