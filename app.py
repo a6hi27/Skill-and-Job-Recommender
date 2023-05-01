@@ -207,6 +207,10 @@ def logout():
     session.pop('mailcompany', None)
     session.pop('appliedjobid', None)
     session.pop('state', None)
+    session.pop('jobid',None)
+    session.pop('userid',None)
+    session.pop('companies',None)
+    session.pop('arr',None)
     return redirect("/login")
 
 
@@ -223,7 +227,7 @@ def home():
             while dictionary is not None:
                 if dictionary[1].replace(" ", "").casefold() == user_search or dictionary[2].replace(" ", "").casefold() == user_search or dictionary[4].replace(" ", "").casefold() == user_search or dictionary[5].replace(" ", "").casefold() == user_search or dictionary[6].replace(" ", "").casefold() == user_search:
                     dict = {
-                        'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13])
+                        'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]),'count':dictionary[14]
                     }
                     arr.append(dict)
                 dictionary = cursor.fetchone()
@@ -238,7 +242,7 @@ def home():
             dictionary = cursor.fetchone()
             while dictionary is not None:
                 dict = {
-                    'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13])
+                    'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]),'count':dictionary[14]
                 }
                 arr.append(dict)
                 dictionary = cursor.fetchone()
@@ -284,6 +288,9 @@ def store_like():
     if not acc:
         insert_sql = "INSERT INTO LIKES(USERID,JOB_ID) VALUES(?,?)"
         cursor.execute(insert_sql, session['userid'], session['jobid'])
+        update_sql = "UPDATE companies SET count = count+1 WHERE job_id = ?"
+        cursor.execute(update_sql, session['jobid'])
+        print('updated')
         conn.commit()
     liked = 1
     return render_template('index.html', companies=session['companies'], arr=session['arr'], liked=liked)

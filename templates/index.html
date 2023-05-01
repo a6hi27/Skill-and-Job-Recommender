@@ -37,10 +37,10 @@
 						type: 'POST',
 						url: "{{url_for('store_like')}}",
 						data: { 'jobid': jobid },
-						success: function () {
-							alert('saved');
-						}
 					});
+					$('.content').toggleClass("heart-active")
+					$('.text').toggleClass("heart-active")
+					$('.heart').toggleClass("heart-active")
 
 				});
 			});
@@ -52,54 +52,53 @@
 		}
 		function companydetails(obj) {
 			var jobid = document.getElementById('jobid').innerHTML;
-			$.ajax({
-				type: 'POST',
-				url: "{{url_for('is_liked')}}",
-				data: { 'jobid': jobid },
-				success: function (data) {
-					const liked = JSON.parse(data)
-					if (liked.liked) {
+			console.log(jobid)
+			$.post("{{url_for('is_liked')}}",
+				{ jobid: jobid },
+				function (data) {
+					var liked = data.liked
+					if (liked) {
 						$('.content').toggleClass("heart-active")
 						$('.text').toggleClass("heart-active")
 						$('.heart').toggleClass("heart-active")
 					}
-					var jobid = document.getElementById('jobid')
-					var cname = document.getElementById('cname')
-					var role = document.getElementById('role')
-					var salary = document.getElementById('salary')
-					var skill_1 = document.getElementById('skill_1')
-					var skill_2 = document.getElementById('skill_2')
-					var skill_3 = document.getElementById('skill_3')
-					var ex = document.getElementById('ex')
-					var job_location = document.getElementById('job_location')
-					var vacancy = document.getElementById('vacancy')
-					var link = document.getElementById('link')
-					var logo = document.getElementById('logo')
-					var description = document.getElementById('description')
+				})
+			var jobid = document.getElementById('jobid')
+			var cname = document.getElementById('cname')
+			var role = document.getElementById('role')
+			var salary = document.getElementById('salary')
+			var skill_1 = document.getElementById('skill_1')
+			var skill_2 = document.getElementById('skill_2')
+			var skill_3 = document.getElementById('skill_3')
+			var ex = document.getElementById('ex')
+			var job_location = document.getElementById('job_location')
+			var vacancy = document.getElementById('vacancy')
+			var link = document.getElementById('link')
+			var logo = document.getElementById('logo')
+			var description = document.getElementById('description')
+			var count = document.getElementById('count')
 
-					var json = JSON.parse(decodeHtml('{{companies}}'));
-					var id = obj.getAttribute('id');
-					var clickedcompany = json.find(function (obj) {
-						return obj.jobid == id;
-					});
-					jobid.innerHTML = clickedcompany.jobid
-					cname.innerHTML = clickedcompany.cname
-					role.innerHTML = clickedcompany.role
-					salary.innerHTML = clickedcompany.salary + " LPA"
-					skill_1.innerHTML = clickedcompany.skill_1
-					skill_2.innerHTML = clickedcompany.skill_2
-					skill_3.innerHTML = clickedcompany.skill_3
-					ex.innerHTML = clickedcompany.ex + " Years"
-					job_location.innerHTML = clickedcompany.job_location
-					vacancy.innerHTML = clickedcompany.vacancy
-					link.href = clickedcompany.link
-					logo.src = clickedcompany.logo
-					description.innerText = clickedcompany.description
-
-				}
+			var json = JSON.parse(decodeHtml('{{companies}}'));
+			var id = obj.getAttribute('id');
+			var clickedcompany = json.find(function (obj) {
+				return obj.jobid == id;
 			});
-
+			jobid.innerHTML = clickedcompany.jobid
+			cname.innerHTML = clickedcompany.cname
+			role.innerHTML = clickedcompany.role
+			salary.innerHTML = clickedcompany.salary + " LPA"
+			skill_1.innerHTML = clickedcompany.skill_1
+			skill_2.innerHTML = clickedcompany.skill_2
+			skill_3.innerHTML = clickedcompany.skill_3
+			ex.innerHTML = clickedcompany.ex + " Years"
+			job_location.innerHTML = clickedcompany.job_location
+			vacancy.innerHTML = clickedcompany.vacancy
+			link.href = clickedcompany.link
+			logo.src = clickedcompany.logo
+			description.innerText = clickedcompany.description
+			count.innerText = clickedcompany.count
 		}
+
 		function redirectToApply() {
 			let jobid = document.getElementById('jobid').innerText
 			if (jobid != '') {
@@ -174,9 +173,10 @@
 					<div class="heart-btn">
 						<div class="content">
 							<span class="heart"></span>
-							<span class="text">Like</span>
+							<span class="text" id="count">{{arr[0].count}}</span>
 						</div>
 					</div>
+					
 				</div>
 				<a id="link" href="{{arr[0].link}}" target="_blank">
 					<div class="Aboutcompany"><b>About Company</b></div>
