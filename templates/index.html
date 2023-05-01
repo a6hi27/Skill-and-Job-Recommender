@@ -29,16 +29,19 @@
 
 	<script>
 		$(document).ready(function () {
-			$('.content').click(function () {
-				$('.content').toggleClass("heart-active")
-				$('.text').toggleClass("heart-active")
-				$('.heart').toggleClass("heart-active")
-				var jobid = document.getElementById('jobid');
-				console.log(jobid)
-				$.ajax({
-					url: '/like',
-					type: 'POST',
-					data: { 'jobid': jobid.value }
+			$(document).click(function () {
+				$('.content').click(function () {
+					var jobid = document.getElementById('jobid').innerHTML;
+					console.log(jobid)
+					$.ajax({
+						type: 'POST',
+						url: "{{url_for('store_like')}}",
+						data: { 'jobid': jobid },
+						success: function () {
+							alert('saved');
+						}
+					});
+
 				});
 			});
 		});
@@ -47,54 +50,58 @@
 			txt.innerHTML = html;
 			return txt.value;
 		}
-
 		function companydetails(obj) {
-			var jobid = document.getElementById('jobid')
-			var cname = document.getElementById('cname')
-			var role = document.getElementById('role')
-			var salary = document.getElementById('salary')
-			var skill_1 = document.getElementById('skill_1')
-			var skill_2 = document.getElementById('skill_2')
-			var skill_3 = document.getElementById('skill_3')
-			var ex = document.getElementById('ex')
-			var job_location = document.getElementById('job_location')
-			var vacancy = document.getElementById('vacancy')
-			var link = document.getElementById('link')
-			var logo = document.getElementById('logo')
-			var description = document.getElementById('description')
+			var jobid = document.getElementById('jobid').innerHTML;
+			$.ajax({
+				type: 'POST',
+				url: "{{url_for('is_liked')}}",
+				data: { 'jobid': jobid },
+				success: function (data) {
+					const liked = JSON.parse(data)
+					if (liked.liked) {
+						$('.content').toggleClass("heart-active")
+						$('.text').toggleClass("heart-active")
+						$('.heart').toggleClass("heart-active")
+					}
+					var jobid = document.getElementById('jobid')
+					var cname = document.getElementById('cname')
+					var role = document.getElementById('role')
+					var salary = document.getElementById('salary')
+					var skill_1 = document.getElementById('skill_1')
+					var skill_2 = document.getElementById('skill_2')
+					var skill_3 = document.getElementById('skill_3')
+					var ex = document.getElementById('ex')
+					var job_location = document.getElementById('job_location')
+					var vacancy = document.getElementById('vacancy')
+					var link = document.getElementById('link')
+					var logo = document.getElementById('logo')
+					var description = document.getElementById('description')
 
-			var json = JSON.parse(decodeHtml('{{companies}}'));
-			var id = obj.getAttribute('id');
-			var clickedcompany = json.find(function (obj) {
-				return obj.jobid == id;
+					var json = JSON.parse(decodeHtml('{{companies}}'));
+					var id = obj.getAttribute('id');
+					var clickedcompany = json.find(function (obj) {
+						return obj.jobid == id;
+					});
+					jobid.innerHTML = clickedcompany.jobid
+					cname.innerHTML = clickedcompany.cname
+					role.innerHTML = clickedcompany.role
+					salary.innerHTML = clickedcompany.salary + " LPA"
+					skill_1.innerHTML = clickedcompany.skill_1
+					skill_2.innerHTML = clickedcompany.skill_2
+					skill_3.innerHTML = clickedcompany.skill_3
+					ex.innerHTML = clickedcompany.ex + " Years"
+					job_location.innerHTML = clickedcompany.job_location
+					vacancy.innerHTML = clickedcompany.vacancy
+					link.href = clickedcompany.link
+					logo.src = clickedcompany.logo
+					description.innerText = clickedcompany.description
+
+				}
 			});
-			jobid.innerHTML = clickedcompany.jobid
-			cname.innerHTML = clickedcompany.cname
-			role.innerHTML = clickedcompany.role
-			salary.innerHTML = clickedcompany.salary + " LPA"
-			skill_1.innerHTML = clickedcompany.skill_1
-			skill_2.innerHTML = clickedcompany.skill_2
-			skill_3.innerHTML = clickedcompany.skill_3
-			ex.innerHTML = clickedcompany.ex + " Years"
-			job_location.innerHTML = clickedcompany.job_location
-			vacancy.innerHTML = clickedcompany.vacancy
-			link.href = clickedcompany.link
-			logo.src = clickedcompany.logo
-			description.innerText = clickedcompany.description
+
 		}
 		function redirectToApply() {
 			let jobid = document.getElementById('jobid').innerText
-			// const request = new XMLHttpRequest()
-			// request.open('POST', `/apply/${jobid}`)
-			// request.send()
-
-			// fetch(`/apply/${jobid}`, {method:"POST"}).then(res => {
-			// 	console.log("Res came", res)
-			// 	// window.location = '/apply'
-			// 	if(res.headers['Location']){
-			// 		window.location = res.headers['Location']
-			// 	}
-			// })
 			if (jobid != '') {
 				var form = document.createElement("form");
 				document.body.appendChild(form);
@@ -103,10 +110,24 @@
 				form.submit();
 			}
 		}
+		$(document).ready(function () {
+			// Show the alert message
+			$('.alert').fadeIn();
+
+			// Hide the alert message after 5 seconds
+			setTimeout(function () {
+				$('.alert').fadeOut();
+			}, 5000);
+		});		  
 	</script>
 </head>
 
 <body>
+	{%if message%}
+	<div class="alert" style="display:none;">
+		<p>{{ message }}</p>
+	</div>
+	{% endif %}
 	<div class="navbar-wrapper">
 		<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
 			<a class="navbar-brand text-dark h5" href="/home"><b>Hire Me!</b></a>
@@ -160,7 +181,6 @@
 				<a id="link" href="{{arr[0].link}}" target="_blank">
 					<div class="Aboutcompany"><b>About Company</b></div>
 				</a>
-				<p class="errormsg">{{msg}}</p>
 			</div>
 			<div class="outboxinbox2">
 				<div>

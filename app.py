@@ -8,20 +8,20 @@ from random import randint
 
 import google.auth.transport.requests
 import requests
-from flask import Flask, abort, redirect, render_template, request, session
+from flask import Flask, abort, redirect, render_template, request, session, jsonify
 from flask_mail import Mail, Message
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 
 
-azureserver = ''
+azureserver = 'sqlhireme.database.windows.net'
 azuredatabase = 'sqldb'
-azureusername = ''
-azurepassword = ''
+azureusername = 'a6hi27'
+azurepassword = '*Abhinav123'
 azuredriver = '{ODBC Driver 18 for SQL Server}'
 conn = pyodbc.connect('DRIVER='+azuredriver+';SERVER=tcp:'+azureserver +
-                      ';PORT=1433;DATABASE='+azuredatabase+';UID='+azureusername+';PWD=' + azurepassword)
+                      ';PORT=1433;DATABASE='+azuredatabase+';UID='+azureusername+';PWD='+azurepassword)
 cursor = conn.cursor()
 app = Flask(__name__)
 app.debug = True
@@ -42,7 +42,7 @@ password = ""
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 465
 app.config["MAIL_USERNAME"] = '2k19cse052@kiot.ac.in'
-app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_PASSWORD'] = 'oimptgpdjiukindy'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
@@ -50,16 +50,17 @@ mail = Mail(app)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
-# GOOGLE_CLIENT_ID = ""
-# client_secrets_file = os.path.join(
-#     pathlib.Path(__file__).parent, "client_secret.json")
+GOOGLE_CLIENT_ID = "423186228081-7pf3urrp4hfk1ksjdb9ev9t7dbj1iden.apps.googleusercontent.com"
+client_secrets_file = os.path.join(
+    pathlib.Path(__file__).parent, "client_secret.json")
 
-# flow = Flow.from_client_secrets_file(
-#     client_secrets_file=client_secrets_file,
-#     scopes=["https://www.googleapis.com/auth/userinfo.profile",
-#             "https://www.googleapis.com/auth/userinfo.email", "openid"],
-#     redirect_uri="http://127.0.0.1:5000/callback"
-# )
+flow = Flow.from_client_secrets_file(
+    client_secrets_file=client_secrets_file,
+    scopes=["https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email", "openid"],
+    redirect_uri="http://127.0.0.1:5000/callback"
+)
+
 
 @app.route("/signup")
 @app.route("/")
@@ -126,75 +127,73 @@ def validate():
         return redirect('/')
 
 
-# @app.route("/googlelogin")
-# def googlelogin():
-#     authorization_url, state = flow.authorization_url()
-#     session["state"] = state
-#     return redirect(authorization_url)
+@app.route("/googlelogin")
+def googlelogin():
+    authorization_url, state = flow.authorization_url()
+    session["state"] = state
+    return redirect(authorization_url)
 
 
-# @app.route("/callback")
-# def callback():
-#     flow.fetch_token(authorization_response=request.url)
+@app.route("/callback")
+def callback():
+    flow.fetch_token(authorization_response=request.url)
 
-#     if not session["state"] == request.args["state"]:
-#         abort(500)  # State does not match!
+    if not session["state"] == request.args["state"]:
+        abort(500)  # State does not match!
 
-#     credentials = flow.credentials
-#     request_session = requests.session()
-#     cached_session = cachecontrol.CacheControl(request_session)
-#     token_request = google.auth.transport.requests.Request(
-#         session=cached_session)
+    credentials = flow.credentials
+    request_session = requests.session()
+    cached_session = cachecontrol.CacheControl(request_session)
+    token_request = google.auth.transport.requests.Request(
+        session=cached_session)
 
-#     id_info = id_token.verify_oauth2_token(
-#         id_token=credentials._id_token,
-#         request=token_request,
-#         audience=GOOGLE_CLIENT_ID,
-#         clock_skew_in_seconds=5
-#     )
+    id_info = id_token.verify_oauth2_token(
+        id_token=credentials._id_token,
+        request=token_request,
+        audience=GOOGLE_CLIENT_ID,
+        clock_skew_in_seconds=5
+    )
 
-#     session["useremail"] = id_info.get("email")
-#     session["first_name"] = id_info.get("given_name")
-#     session["last_name"] = id_info.get("family_name")
+    session["useremail"] = id_info.get("email")
+    session["first_name"] = id_info.get("given_name")
+    session["last_name"] = id_info.get("family_name")
 
-#     global first_name
-#     global last_name
-#     global useremail
-#     global password
+    global first_name
+    global last_name
+    global useremail
+    global password
 
-#     first_name = session['first_name']
-#     last_name = session['last_name']
-#     useremail = session['useremail']
-#     password = ""
+    first_name = session['first_name']
+    last_name = session['last_name']
+    useremail = session['useremail']
+    password = ""
 
-#     usersql = "SELECT * FROM User WHERE email =?"
-#     userstmt = ibm_db.prepare(connection, usersql)
-#     ibm_db.bind_param(userstmt, 1, useremail)
-#     ibm_db.execute(userstmt)
-#     useraccount = ibm_db.fetch_assoc(userstmt)
-#     if useraccount:
-#         session['newuser'] = useraccount['NEWUSER']
-#         if (session['newuser'] == 1):
-#             print(session['newuser'])
-#             return redirect('/profile')
-#         prosql = "SELECT * FROM profile WHERE email_id =?"
-#         prostmt = ibm_db.prepare(connection, prosql)
-#         ibm_db.bind_param(prostmt, 1, useremail)
-#         ibm_db.execute(prostmt)
-#         proaccount = ibm_db.fetch_assoc(prostmt)
-#         session['skill'] = proaccount['SKILL']
-#         return redirect('/home')
+    sql = "SELECT * FROM users WHERE email =?"
+    cursor.execute(sql, useremail)
+    useraccount = cursor.fetchone()
 
-#     else:
+    if useraccount:
+        session['userid'] = useraccount[0]
+        session['newuser'] = useraccount[5]
+        if (session['newuser'] == 1):
+            return redirect('/profile')
+        sql = "SELECT * FROM profile WHERE email_id =?"
+        cursor.execute(sql, useremail)
+        proaccount = cursor.fetchone()
+        session['skill'] = proaccount[12]
+        return redirect('/home')
 
-#         insert_sql = "INSERT INTO User(first_name,last_name,email,pass) VALUES (?,?,?,?)"
-#         prep_stmt = ibm_db.prepare(connection, insert_sql)
-#         ibm_db.bind_param(prep_stmt, 1, first_name)
-#         ibm_db.bind_param(prep_stmt, 2, last_name)
-#         ibm_db.bind_param(prep_stmt, 3, useremail)
-#         ibm_db.bind_param(prep_stmt, 4, password)
-#         ibm_db.execute(prep_stmt)
-#         return redirect("/profile")
+    else:
+        insert_sql = "INSERT INTO users(first_name,last_name,email,pass) VALUES (?,?,?,?)"
+        values = (first_name, last_name, useremail, password)
+        cursor.execute(insert_sql, values)
+        conn.commit()
+        sql = "SELECT * FROM users WHERE email =?"
+        cursor.execute(sql, useremail)
+        useraccount = cursor.fetchone()
+        session['userid'] = useraccount[0]
+        session['newuser'] = useraccount[5]
+        return redirect("/profile")
 
 
 @app.route("/logout")
@@ -230,7 +229,7 @@ def home():
                 dictionary = cursor.fetchone()
             companies = json.dumps(arr)
 
-            return render_template("index.html", companies=companies, arr=arr)
+            return render_template("index.html", companies=companies, arr=arr, liked=0)
         else:
             arr = []
             sql = "SELECT * FROM companies where skill_1 = ? or skill_2 = ? or skill_3 = ?"
@@ -245,30 +244,49 @@ def home():
                 dictionary = cursor.fetchone()
             arr.reverse()
             companies = json.dumps(arr)
+            session['companies'] = companies
+            session['arr'] = arr
             # msg = getattr(session, 'msg', "")
             # print(session)
             # print("msg = ", msg)
             # if(getattr(session, 'msg', None) is not None):
             #     session.pop('msg')
-            msg = ''
+            message = ''
             if (session.get('msg') is not None):
-                msg = session.get('msg')
+                message = session.get('msg')
                 session.pop('msg')
-            return render_template("index.html", companies=companies, arr=arr, msg=msg)
+            return render_template("index.html", companies=companies, arr=arr, message=message, liked=0)
     else:
         return redirect('/login')
 
 
-@app.route('/like', methods=['POST', 'GET'])
+@app.route('/liked', methods=['POST'])
+def is_liked():
+    session['jobid'] = request.form['jobid']
+    check_sql = "SELECT * FROM LIKES WHERE userid = ? and job_id = ?"
+    cursor.execute(check_sql, session['userid'], session['jobid'])
+    acc = cursor.fetchone()
+    if not acc:
+        print('Not liked before')
+        liked = 0
+    else:
+        liked = 1
+        print("liked before")
+    return jsonify({'liked': liked})
+
+
+@app.route('/like', methods=['POST'])
 def store_like():
-    session['jobid'] = request.form.get('jobid')
-    print(session['jobid'])
-    insert_sql = "INSERT INTO LIKES(USERID,JOBID) VALUES(?,?)"
-    # prep_stmt = ibm_db.prepare(connection, insert_sql)
-    # ibm_db.bind_param(prep_stmt, 1, session['userid'])
-    # ibm_db.bind_param(prep_stmt, 2, session['jobid'])
-    # ibm_db.execute(prep_stmt)
-    return None
+    session['jobid'] = request.form['jobid']
+    check_sql = "SELECT * FROM LIKES WHERE userid = ? and job_id = ?"
+    cursor.execute(check_sql, session['userid'], session['jobid'])
+    acc = cursor.fetchone()
+    if not acc:
+        insert_sql = "INSERT INTO LIKES(USERID,JOB_ID) VALUES(?,?)"
+        cursor.execute(insert_sql, session['userid'], session['jobid'])
+        conn.commit()
+    liked = 1
+    return render_template('index.html', companies=session['companies'], arr=session['arr'], liked=liked)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -279,12 +297,12 @@ def login():
         sql = "SELECT * FROM users WHERE email =?"
         cursor.execute(sql, useremail)
         account = cursor.fetchone()
-        
+
         if account:
             session["useremail"] = useremail
             session["newuser"] = account[5]
             session['userid'] = account[0]
-            
+
             if (password == str(account[4]).strip()):
                 if (session['newuser'] == 1):
                     return redirect('/profile')
@@ -325,7 +343,7 @@ def profile():
             insert_sql = "INSERT INTO profile VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
             cursor.execute(insert_sql, first_name, last_name, mobile_no, address_line_1, address_line_2,
-                           zipcode, city, session['useremail'], education, country, state, experience, skill,session['userid'])
+                           zipcode, city, session['useremail'], education, country, state, experience, skill, session['userid'])
 
             insert_sql = "UPDATE users SET newuser = 0 WHERE email=?"
             session['newuser'] = 0
@@ -386,9 +404,7 @@ def forgotpass():
         password = request.form.get('password')
 
         sql = "SELECT * FROM users WHERE email =?"
-        cursor.execute(sql,useremail)
-        cursor.fetchone()
-        conn.commit()
+        cursor.execute(sql, useremail)
         account = cursor.fetchone()
 
         if i == 1:
@@ -400,12 +416,8 @@ def forgotpass():
 
         elif i == 2:
             sql = "UPDATE users SET pass=? WHERE email=?"
-            cursor.execute(sql,password,email)
-            cursor.fetchone()
+            cursor.execute(sql, password, email)
             conn.commit()
-            # ibm_db.bind_param(stmt, 1, password)
-            # ibm_db.bind_param(stmt, 2, email)
-            # ibm_db.execute(stmt)
             i = 1
             return render_template('signin.html')
 
@@ -431,8 +443,8 @@ def apply(jobid):
     if "useremail" in session:
         if request.method == "POST":
             session['appliedjobid'] = json.loads(jobid)
-            sql="select * from appliedcompany where userid=?"
-            cursor.execute(sql,session['userid'])
+            sql = "select * from appliedcompany where userid=?"
+            cursor.execute(sql, session['userid'])
             account = cursor.fetchone()
             while (account is not None):
                 if (session['appliedjobid'] == account[1]):
@@ -447,11 +459,11 @@ def apply(jobid):
             return redirect('/profile')
         # else:
         jobsql = "SELECT * FROM companies WHERE job_id =?"
-        cursor.execute(jobsql,jobid)
+        cursor.execute(jobsql, jobid)
         appliedcompany = cursor.fetchone()
         session['mailcompany'] = appliedcompany[1]
         sql = "SELECT * FROM profile WHERE email_id =?"
-        cursor.execute(sql,session['useremail'])
+        cursor.execute(sql, session['useremail'])
         account = cursor.fetchone()
         first_name = account[0]
         last_name = account[1]
@@ -481,7 +493,8 @@ def applysuccess():
             state = request.form.get('states')
             experience = request.form.get('experience')
             insert_sql = "INSERT INTO appliedcompany(userid,jobid,first_name,last_name,mobile_number,zipcode,city,email,education,country,state,experience) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
-            cursor.execute(insert_sql,session['userid'],session['appliedjobid'],first_name,last_name,mobile_no,zipcode,city,session['useremail'],education,country,state,experience)
+            cursor.execute(insert_sql, session['userid'], session['appliedjobid'], first_name, last_name,
+                           mobile_no, zipcode, city, session['useremail'], education, country, state, experience)
             conn.commit()
             msg = Message(subject='Job Application Notification', sender='hackjacks@gmail.com',
                           recipients=[session['useremail']])
@@ -502,13 +515,11 @@ def adminlogin():
         adminmail = request.form.get('email')
         password = request.form.get('password')
         sql = "SELECT * FROM admin WHERE email =?"
-        stmt = ibm_db.prepare(connection, sql)
-        ibm_db.bind_param(stmt, 1, adminmail)
-        ibm_db.execute(stmt)
-        account = ibm_db.fetch_assoc(stmt)
+        cursor.execute(sql, adminmail)
+        account = cursor.fetchone()
         if account:
             session["adminmail"] = adminmail
-            if (password == str(account['PASSWORD']).strip()):
+            if (password == str(account[1]).strip()):
                 return render_template('adminhome.html')
             else:
                 return render_template('adminlogin.html', msg="Password is invalid")
@@ -536,37 +547,22 @@ def adminhome():
             logo = request.form.get('logo')
             description = request.form.get('description')
 
-            insert_sql = "INSERT INTO company (company_name, role, experience, skill_1, skill_2, skill_3, vacancy, stream, job_location, salary, website, logo,description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+            insert_sql = "INSERT INTO companies (company_name, role, experience, skill_1, skill_2, skill_3, vacancy, stream, job_location, salary, website, logo,description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
-            prep_stmt = ibm_db.prepare(connection, insert_sql)
-            ibm_db.bind_param(prep_stmt, 1, company_name)
-            ibm_db.bind_param(prep_stmt, 2, role)
-            ibm_db.bind_param(prep_stmt, 3, experience)
-            ibm_db.bind_param(prep_stmt, 4, skill_1)
-            ibm_db.bind_param(prep_stmt, 5, skill_2)
-            ibm_db.bind_param(prep_stmt, 6, skill_3)
-            ibm_db.bind_param(prep_stmt, 7, vacancy)
-            ibm_db.bind_param(prep_stmt, 8, stream)
-            ibm_db.bind_param(prep_stmt, 9, job_location)
-            ibm_db.bind_param(prep_stmt, 10, salary)
-            ibm_db.bind_param(prep_stmt, 11, link)
-            ibm_db.bind_param(prep_stmt, 12, logo)
-            ibm_db.bind_param(prep_stmt, 13, description)
-            ibm_db.execute(prep_stmt)
+            cursor.execute(insert_sql, company_name, role, experience, skill_1, skill_2,
+                           skill_3, vacancy, stream, job_location, salary, link, logo, description)
+            conn.commit()
 
             sql = 'SELECT email_id from profile Where skill = ? or skill = ? or skill = ?'
-            stmt = ibm_db.prepare(connection, sql)
-            ibm_db.bind_param(stmt, 1, skill_1)
-            ibm_db.bind_param(stmt, 2, skill_2)
-            ibm_db.bind_param(stmt, 3, skill_3)
-            ibm_db.execute(stmt)
-            account = ibm_db.fetch_assoc(stmt)
-            while account != False:
+            cursor.execute(sql, skill_1, skill_2, skill_3)
+            account = cursor.fetchone()
+            while account is not None:
                 msg = Message(subject='Job Posting', sender='hackjacks@gmail.com',
-                              recipients=[account['EMAIL_ID']])
+                              recipients=[account[0]])
+
                 msg.body = company_name+"has posted a new job. We are sending you this mail since you chose one of this company's required skill as your preferred skill"
                 mail.send(msg)
-                account = ibm_db.fetch_assoc(stmt)
+                account = cursor.fetchone()
             return render_template('adminhome.html')
 
         return render_template('adminhome.html')

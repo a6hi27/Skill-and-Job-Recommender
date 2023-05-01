@@ -348,3 +348,17 @@ input[type="text"] {
   border-radius: 20px;
   background-color: #ffffff;
 }
+
+.alert {
+  position: fixed;
+  top: 8%;
+  left: 73%;
+  /* transform: translate(-50%, -50%); */
+  z-index: 9999;
+  background-color: #f44336;
+  color: white;
+  font-size: 25px;
+  /* padding: 20px; */
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
