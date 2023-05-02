@@ -207,10 +207,10 @@ def logout():
     session.pop('mailcompany', None)
     session.pop('appliedjobid', None)
     session.pop('state', None)
-    session.pop('jobid',None)
-    session.pop('userid',None)
-    session.pop('companies',None)
-    session.pop('arr',None)
+    session.pop('jobid', None)
+    session.pop('userid', None)
+    session.pop('companies', None)
+    session.pop('arr', None)
     return redirect("/login")
 
 
@@ -227,13 +227,14 @@ def home():
             while dictionary is not None:
                 if dictionary[1].replace(" ", "").casefold() == user_search or dictionary[2].replace(" ", "").casefold() == user_search or dictionary[4].replace(" ", "").casefold() == user_search or dictionary[5].replace(" ", "").casefold() == user_search or dictionary[6].replace(" ", "").casefold() == user_search:
                     dict = {
-                        'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]),'count':dictionary[14]
+                        'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]), 'count': dictionary[14]
                     }
                     arr.append(dict)
                 dictionary = cursor.fetchone()
-            companies = json.dumps(arr)
+            sorted_arr = sorted(arr, key=lambda x: x['count'], reverse=True)
+            companies = json.dumps(sorted_arr)
 
-            return render_template("index.html", companies=companies, arr=arr, liked=0)
+            return render_template("index.html", companies=companies, arr=sorted_arr, liked=0)
         else:
             arr = []
             sql = "SELECT * FROM companies where skill_1 = ? or skill_2 = ? or skill_3 = ?"
@@ -242,14 +243,15 @@ def home():
             dictionary = cursor.fetchone()
             while dictionary is not None:
                 dict = {
-                    'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]),'count':dictionary[14]
+                    'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]), 'count': dictionary[14]
                 }
                 arr.append(dict)
                 dictionary = cursor.fetchone()
-            arr.reverse()
-            companies = json.dumps(arr)
+            # arr.reverse()
+            sorted_arr = sorted(arr, key=lambda x: x['count'], reverse=True)
+            companies = json.dumps(sorted_arr)
             session['companies'] = companies
-            session['arr'] = arr
+            session['arr'] = sorted_arr
             # msg = getattr(session, 'msg', "")
             # print(session)
             # print("msg = ", msg)
@@ -259,7 +261,7 @@ def home():
             if (session.get('msg') is not None):
                 message = session.get('msg')
                 session.pop('msg')
-            return render_template("index.html", companies=companies, arr=arr, message=message, liked=0)
+            return render_template("index.html", companies=companies, arr=sorted_arr, message=message, liked=0)
     else:
         return redirect('/login')
 
@@ -292,7 +294,14 @@ def store_like():
         cursor.execute(update_sql, session['jobid'])
         print('updated')
         conn.commit()
-    liked = 1
+        liked = 1
+    else:
+        delete_sql = "DELETE FROM LIKES WHERE USERID=? and JOB_ID=?"
+        cursor.execute(delete_sql, session['userid'], session['jobid'])
+        update_sql = "UPDATE companies SET count = count-1 WHERE job_id = ?"
+        cursor.execute(update_sql, session['jobid'])
+        conn.commit()
+        liked = 0
     return render_template('index.html', companies=session['companies'], arr=session['arr'], liked=liked)
 
 
