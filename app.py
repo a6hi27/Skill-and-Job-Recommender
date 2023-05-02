@@ -18,7 +18,7 @@ from pip._vendor import cachecontrol
 azureserver = 'sqlhireme.database.windows.net'
 azuredatabase = 'sqldb'
 azureusername = 'a6hi27'
-azurepassword = '*Abhinav123'
+azurepassword = ''
 azuredriver = '{ODBC Driver 18 for SQL Server}'
 conn = pyodbc.connect('DRIVER='+azuredriver+';SERVER=tcp:'+azureserver +
                       ';PORT=1433;DATABASE='+azuredatabase+';UID='+azureusername+';PWD='+azurepassword)
@@ -42,7 +42,7 @@ password = ""
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 465
 app.config["MAIL_USERNAME"] = '2k19cse052@kiot.ac.in'
-app.config['MAIL_PASSWORD'] = 'oimptgpdjiukindy'
+app.config['MAIL_PASSWORD'] = ''
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
@@ -50,7 +50,7 @@ mail = Mail(app)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
-GOOGLE_CLIENT_ID = "423186228081-7pf3urrp4hfk1ksjdb9ev9t7dbj1iden.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = ""
 client_secrets_file = os.path.join(
     pathlib.Path(__file__).parent, "client_secret.json")
 
