@@ -18,7 +18,7 @@ from pip._vendor import cachecontrol
 azureserver = 'sqlhireme.database.windows.net'
 azuredatabase = 'sqldb'
 azureusername = 'a6hi27'
-azurepassword = ''
+azurepassword = '*Abhinav123'
 azuredriver = '{ODBC Driver 18 for SQL Server}'
 conn = pyodbc.connect('DRIVER='+azuredriver+';SERVER=tcp:'+azureserver +
                       ';PORT=1433;DATABASE='+azuredatabase+';UID='+azureusername+';PWD='+azurepassword)
@@ -42,7 +42,7 @@ password = ""
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 465
 app.config["MAIL_USERNAME"] = '2k19cse052@kiot.ac.in'
-app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_PASSWORD'] = 'oimptgpdjiukindy'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
@@ -50,7 +50,7 @@ mail = Mail(app)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
-GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_ID = "423186228081-7pf3urrp4hfk1ksjdb9ev9t7dbj1iden.apps.googleusercontent.com"
 client_secrets_file = os.path.join(
     pathlib.Path(__file__).parent, "client_secret.json")
 
@@ -268,8 +268,9 @@ def home():
 
 @app.route('/liked', methods=['POST'])
 def is_liked():
+    liked = 0
     session['jobid'] = request.form['jobid']
-    check_sql = "SELECT * FROM LIKES WHERE userid = ? and job_id = ?"
+    check_sql = "SELECT * FROM LIKES WHERE userid = ? and job_id = ?;"
     cursor.execute(check_sql, session['userid'], session['jobid'])
     acc = cursor.fetchone()
     if not acc:
@@ -277,32 +278,75 @@ def is_liked():
         liked = 0
     else:
         liked = 1
+        print(f"This is liked {liked}")
         print("liked before")
-    return jsonify({'liked': liked})
+    check_sql2 = "SELECT count FROM companies WHERE job_id = ?;"
+    cursor.execute(check_sql2, session['jobid'])
+    acc = cursor.fetchone()
+    count = acc[0]
+    print(f"The count is {count}")
+    return jsonify({'liked': liked, 'count': count})
 
 
 @app.route('/like', methods=['POST'])
 def store_like():
+    liked = 0
     session['jobid'] = request.form['jobid']
-    check_sql = "SELECT * FROM LIKES WHERE userid = ? and job_id = ?"
+    print(f"The jobid is {session['jobid']}")
+    check_sql = "SELECT * FROM LIKES WHERE userid = ? and job_id = ?;"
     cursor.execute(check_sql, session['userid'], session['jobid'])
     acc = cursor.fetchone()
     if not acc:
-        insert_sql = "INSERT INTO LIKES(USERID,JOB_ID) VALUES(?,?)"
+        insert_sql = "INSERT INTO LIKES(USERID,JOB_ID) VALUES(?,?);"
         cursor.execute(insert_sql, session['userid'], session['jobid'])
-        update_sql = "UPDATE companies SET count = count+1 WHERE job_id = ?"
-        cursor.execute(update_sql, session['jobid'])
-        print('updated')
         conn.commit()
+        update_sql = "UPDATE companies SET count = count+1 WHERE job_id = ?;"
+        cursor.execute(update_sql, session['jobid'])
+        conn.commit()
+        print('updated')
+        sql = "SELECT count FROM companies where job_id = ?;"
+        cursor.execute(sql, session['jobid'])
+        count = cursor.fetchone()[0]
+        print(f"The count in if here is {count}")
+        # dictionary = cursor.fetchone()
+        # while dictionary is not None:
+        #     dict = {
+        #         'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]), 'count': dictionary[14]
+        #     }
+        #     arr.append(dict)
+        #     dictionary = cursor.fetchone()
+        #     # arr.reverse()
+        # sorted_arr = sorted(arr, key=lambda x: x['count'], reverse=True)
+        # companies = json.dumps(sorted_arr)
+        # session['companies'] = companies
+        # session['arr'] = sorted_arr
         liked = 1
     else:
-        delete_sql = "DELETE FROM LIKES WHERE USERID=? and JOB_ID=?"
+        delete_sql = "DELETE FROM LIKES WHERE USERID=? and JOB_ID=?;"
         cursor.execute(delete_sql, session['userid'], session['jobid'])
-        update_sql = "UPDATE companies SET count = count-1 WHERE job_id = ?"
+        conn.commit()
+        update_sql = "UPDATE companies SET count = count-1 WHERE job_id = ?;"
         cursor.execute(update_sql, session['jobid'])
         conn.commit()
+        sql = "SELECT count FROM companies where job_id = ?;"
+        cursor.execute(sql, session['jobid'])
+        count = cursor.fetchone()[0]
+        print(f"The count in else here is {count}")
+        # dictionary = cursor.fetchone()
+        # while dictionary is not None:
+        #     dict = {
+        #         'jobid': dictionary[0], 'cname': dictionary[1], 'role': dictionary[2], 'ex': dictionary[3], 'skill_1': dictionary[4], 'skill_2': dictionary[5], 'skill_3': dictionary[6], 'vacancy': dictionary[7], 'stream': dictionary[8], 'job_location': dictionary[9], 'salary': str(dictionary[10]), 'link': dictionary[11], 'logo': dictionary[12], 'description': remove_control_characters(dictionary[13]), 'count': dictionary[14]
+        #     }
+        #     arr.append(dict)
+        #     dictionary = cursor.fetchone()
+        #     # arr.reverse()
+        # sorted_arr = sorted(arr, key=lambda x: x['count'], reverse=True)
+        # companies = json.dumps(sorted_arr)
+        # session['companies'] = companies
+        # session['arr'] = sorted_arr
         liked = 0
-    return render_template('index.html', companies=session['companies'], arr=session['arr'], liked=liked)
+    return jsonify({'liked': liked, 'count': count})
+    # return render_template('index.html', companies=session['companies'], arr=session['arr'],liked=liked)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -310,7 +354,7 @@ def login():
     if request.method == 'POST':
         useremail = request.form.get('email')
         password = request.form.get('password')
-        sql = "SELECT * FROM users WHERE email =?"
+        sql = "SELECT * FROM users WHERE email =?;"
         cursor.execute(sql, useremail)
         account = cursor.fetchone()
 
@@ -323,7 +367,7 @@ def login():
                 if (session['newuser'] == 1):
                     return redirect('/profile')
                 else:
-                    sql = "SELECT * FROM profile WHERE email_id =?"
+                    sql = "SELECT * FROM profile WHERE email_id =?;"
                     cursor.execute(sql, useremail)
                     account = cursor.fetchone()
                     session['skill'] = account[12]
