@@ -32,6 +32,5 @@ spec:
   selector: skilljob.azurecr.io/skilljob:latest
   ports:
   - port: 5000
-    targetPort: 5000
   selector:
     app: skilljob
