@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skilljob
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skilljob
+  template:
+    metadata:
+      labels:
+        app: skilljob
+    spec:
+      containers:
+      - name: skilljob
+        image: skilljob.azurecr.io/skilljob:latest
+        env:
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skilljob
+  labels:
+    app: skilljob
+spec:
+  type: LoadBalancer
+  selector: skilljob.azurecr.io/skilljob:latest
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: skilljob

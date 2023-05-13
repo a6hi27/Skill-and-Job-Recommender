@@ -5,7 +5,7 @@ import pyodbc
 import pathlib
 from random import randint
 
-
+import flask
 import google.auth.transport.requests
 import requests
 from flask import Flask, abort, redirect, render_template, request, session, jsonify
@@ -19,7 +19,7 @@ azureserver = 'sqlhireme.database.windows.net'
 azuredatabase = 'sqldb'
 azureusername = 'a6hi27'
 azurepassword = '*Abhinav123'
-azuredriver = '{ODBC Driver 18 for SQL Server}'
+azuredriver = '{ODBC Driver 17 for SQL Server}'
 conn = pyodbc.connect('DRIVER='+azuredriver+';SERVER=tcp:'+azureserver +
                       ';PORT=1433;DATABASE='+azuredatabase+';UID='+azureusername+';PWD='+azurepassword)
 cursor = conn.cursor()
@@ -58,7 +58,7 @@ flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile",
             "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="http://127.0.0.1:5000/callback"
+    redirect_uri = "http://localhost:5000/callback"
 )
 
 
