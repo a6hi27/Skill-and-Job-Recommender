@@ -5,7 +5,7 @@ import pyodbc
 import pathlib
 from random import randint
 
-import flask
+
 import google.auth.transport.requests
 import requests
 from flask import Flask, abort, redirect, render_template, request, session, jsonify
