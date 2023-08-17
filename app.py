@@ -17,8 +17,8 @@ from pip._vendor import cachecontrol
 
 azureserver = 'sqlhireme.database.windows.net'
 azuredatabase = 'sqldb'
-azureusername = 'a6hi27'
-azurepassword = '*Abhinav123'
+azureusername = 'username'
+azurepassword = 'password'
 azuredriver = '{ODBC Driver 17 for SQL Server}'
 conn = pyodbc.connect('DRIVER='+azuredriver+';SERVER=tcp:'+azureserver +
                       ';PORT=1433;DATABASE='+azuredatabase+';UID='+azureusername+';PWD='+azurepassword)
