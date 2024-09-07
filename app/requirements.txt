@@ -1,0 +1,8 @@
+Flask==2.2.2
+Flask_Mail==0.9.1
+google_auth_oauthlib==0.7.0
+pymysql==1.1.0
+cryptography>=3.0
+pip==22.3
+protobuf==4.23.0
+Requests==2.30.0
